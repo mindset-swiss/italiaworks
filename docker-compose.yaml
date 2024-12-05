@@ -9,5 +9,7 @@ services:
     environment: 
       - NODE_ENV=production
       - PORT=3000
+    env_file:
+      - ./.env
     ports:
       - 3000:3000
