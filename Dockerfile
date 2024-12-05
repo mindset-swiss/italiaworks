@@ -1,4 +1,4 @@
-FROM node:20.12.2 as build
+FROM node:21.7.2 as build
 
 # Create Frontend Build
 WORKDIR /home/node/app/sharetribe
