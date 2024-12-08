@@ -97,6 +97,7 @@ import locationSVG from '../../assets/location.svg';
 import { MIN_LENGTH_FOR_LONG_WORDS } from '../ProfilePage/ProfilePage.js';
 import SectionGallery from './SectionGallery.js';
 import SectionOfferListingsMaybe from './SectionOfferListingsMaybe.js';
+import Share from '../../components/Share/Share.js';
 
 const MIN_LENGTH_FOR_LONG_WORDS_IN_TITLE = 16;
 
@@ -307,11 +308,11 @@ export const ListingPageComponent = props => {
   const schemaAvailability = !currentListing.currentStock
     ? null
     : currentStock > 0
-    ? 'https://schema.org/InStock'
-    : 'https://schema.org/OutOfStock';
+      ? 'https://schema.org/InStock'
+      : 'https://schema.org/OutOfStock';
 
   const availabilityMaybe = schemaAvailability ? { availability: schemaAvailability } : {};
-  const orderData = {deliveryMethod: 'none'};
+  const orderData = { deliveryMethod: 'none' };
   const transaction = null;
   const initialData = { orderData, listing: currentListing, transaction };
   const pageData = handlePageData(initialData, STORAGE_KEY, history);
@@ -500,8 +501,8 @@ export const ListingPageComponent = props => {
             /> */}
 
             {offerListingItems &&
-            Array.isArray(offerListingItems) &&
-            offerListingItems.length > 0 ? (
+              Array.isArray(offerListingItems) &&
+              offerListingItems.length > 0 ? (
               <SectionOfferListingsMaybe
                 listings={offerListingItems}
                 intl={intl}
@@ -552,6 +553,17 @@ export const ListingPageComponent = props => {
               dayCountAvailableForBooking={config.stripe.dayCountAvailableForBooking}
               marketplaceName={config.marketplaceName}
               setInquiryModalOpen={setCustomInquiryModalOpen}
+            />
+            <Share
+              className={css.shareWrapper}
+              title={intl.formatMessage({
+                id: 'ListingPage.ogTitle',
+              }, {
+                title,
+              })}
+              description={intl.formatMessage({
+                id: 'ListingPage.ogDescription',
+              })}
             />
           </div>
           <Modal
@@ -732,7 +744,7 @@ const mapStateToProps = state => {
       ? getListingsOffeListingById(listingOfferEntities, stateOfferListingItems)
       : null;
 
-  
+
 
   const getListing = id => {
     const ref = { id, type: 'listing' };

@@ -2,7 +2,7 @@ import { FormattedMessage } from "react-intl";
 import css from "./Share.module.css";
 import { useLocation } from "react-router-dom/cjs/react-router-dom.min";
 
-const Share = ({ title, description }) => {
+const Share = ({ title, description, className }) => {
   const location = useLocation();
   const url = `${window.location.origin}${location.pathname}${location.search}`;
 
@@ -46,15 +46,15 @@ const Share = ({ title, description }) => {
   ];
 
   return (
-    <div className={css.share}>
+    <div className={`${css.share} ${className ? className : ''}`}>
       <div className={css.shareTitle}>
         <FormattedMessage id="ProfilePage.share" />
       </div>
       <ul className={css.shareList}>
         {options.map((option, key) => (
-          <li>
+          <li key={key}>
             <a
-              href={option.url}
+              href={encodeURI(option.url)}
               target="_blank"
               rel="nofollow"
               className={css.shareLink}

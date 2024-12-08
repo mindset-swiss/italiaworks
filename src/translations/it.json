@@ -460,6 +460,8 @@
   "ListingPage.loadingListingMessage": "Caricamento dell'annuncio…",
   "ListingPage.loadingListingTitle": "Caricamento dell'annuncio…",
   "ListingPage.locationTitle": "Posizione",
+  "ListingPage.ogTitle": "Cercasi: {title} su Italiawork",
+  "ListingPage.ogDescription": "Italiawork è la community italiana per lavori e servizi di ogni dimensione, con pagamenti sicuri e garantiti, sempre vicino a te.",
   "ListingPage.orderTitle": "{title}",
   "ListingPage.ownClosedListing": "Il tuo annuncio è stato chiuso. Non è più visibile sul marketplace.",
   "ListingPage.ownListing": "Questo è il tuo annuncio.",
