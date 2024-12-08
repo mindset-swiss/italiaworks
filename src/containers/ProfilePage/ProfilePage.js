@@ -56,11 +56,15 @@ import SectionTextMaybe from './SectionTextMaybe';
 import SectionYoutubeVideoMaybe from './SectionYoutubeVideoMaybe';
 import _ from 'lodash';
 
+import Share from '../../components/Share/Share';
+
 const MAX_MOBILE_SCREEN_WIDTH = 768;
 export const MIN_LENGTH_FOR_LONG_WORDS = 20;
 
 export const AsideContent = props => {
   const { user, displayName, showLinkToProfileSettingsPage } = props;
+  const intl = useIntl();
+
   return (
     <div className={css.asideContent}>
       <AvatarLarge className={css.avatar} user={user} disableProfileLink />
@@ -79,6 +83,14 @@ export const AsideContent = props => {
           </NamedLink>
         </>
       ) : null}
+      <Share
+        title={intl.formatMessage({
+          id: 'ProfilePage.ogTitle'
+        })}
+        description={intl.formatMessage({
+          id: 'ProfilePage.ogDescription'
+        })}
+      />
     </div>
   );
 };
@@ -320,8 +332,8 @@ export const ProfilePageComponent = props => {
   const isDataLoaded = isPreview
     ? currentUser != null || userShowError != null
     : hasNoViewingRightsOnPrivateMarketplace
-    ? currentUser != null || userShowError != null
-    : user != null || userShowError != null;
+      ? currentUser != null || userShowError != null
+      : user != null || userShowError != null;
 
   const schemaTitleVars = { name: displayName, marketplaceName: config.marketplaceName };
   const schemaTitle = intl.formatMessage({ id: 'ProfilePage.schemaTitle' }, schemaTitleVars);
@@ -372,6 +384,19 @@ export const ProfilePageComponent = props => {
     <Page
       scrollingDisabled={scrollingDisabled}
       title={schemaTitle}
+      // schema={{
+      //   '@context': 'http://schema.org',
+      //   '@type': 'ProfilePage',
+      //   name: schemaTitle,
+      // }}
+      socialSharing={{
+        title: intl.formatMessage({
+          id: 'ProfilePage.ogTitle',
+        }),
+        description: intl.formatMessage({
+          id: 'ProfilePage.ogDescription',
+        }),
+      }}
       schema={{
         '@context': 'http://schema.org',
         '@type': 'ProfilePage',

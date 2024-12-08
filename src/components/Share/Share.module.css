@@ -1,0 +1,22 @@
+.share {
+  margin-top: 2rem;
+}
+
+.shareTitle {
+  font-weight: 700;
+  font-size: 0.9em;
+}
+
+.shareList {
+  margin-top: 0.5rem;
+  padding: 0;
+  display: flex;
+  gap: 0.1rem;
+  flex-direction: column;
+}
+
+.shareLink {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
