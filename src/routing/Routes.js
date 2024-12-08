@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { arrayOf, bool, object, func, shape, string } from 'prop-types';
 import { compose } from 'redux';
 import { connect } from 'react-redux';
-import { Switch, Route, withRouter } from 'react-router-dom';
+import { Switch, Route, withRouter, Redirect } from 'react-router-dom';
 
 import { useRouteConfiguration } from '../context/routeConfigurationContext';
 import { propTypes } from '../util/types';
@@ -16,6 +16,8 @@ import { NamedRedirect } from '../components';
 import NotFoundPage from '../containers/NotFoundPage/NotFoundPage';
 
 import LoadableComponentErrorBoundary from './LoadableComponentErrorBoundary/LoadableComponentErrorBoundary';
+
+const isEmailVerified = currentUser => currentUser?.attributes?.emailVerified;
 
 const isBanned = currentUser => {
   const isBrowser = typeof window !== 'undefined';
@@ -142,14 +144,18 @@ class RouteComponentRenderer extends Component {
     // Banned users are redirected to LandingPage
     const isBannedFromAuthPages = restrictedPageWithCurrentUser && isBanned(currentUser);
     return canShow ? (
-      <LoadableComponentErrorBoundary>
-        <RouteComponent
-          params={match.params}
-          location={location}
-          staticContext={staticContext}
-          {...extraProps}
-        />
-      </LoadableComponentErrorBoundary>
+      (!isEmailVerified(currentUser) && route.auth && route.path !== '/signup') ? (
+        <Redirect to="/signup" />
+      ) : (
+        <LoadableComponentErrorBoundary>
+          <RouteComponent
+            params={match.params}
+            location={location}
+            staticContext={staticContext}
+            {...extraProps}
+          />
+        </LoadableComponentErrorBoundary>
+      )
     ) : isBannedFromAuthPages ? (
       <NamedRedirect name="LandingPage" />
     ) : (
