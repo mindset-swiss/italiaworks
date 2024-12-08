@@ -396,6 +396,11 @@ export const ProfilePageComponent = props => {
         description: intl.formatMessage({
           id: 'ProfilePage.ogDescription',
         }),
+        images1200: [{
+          width: 1280,
+          height: 720,
+          url: 'https://cdn.prod.website-files.com/67388105e786c44d2fd25e83/6752e663a4801698954d151d_italiawork-social-sharing.jpg',
+        }],
       }}
       schema={{
         '@context': 'http://schema.org',
