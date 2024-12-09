@@ -97,6 +97,7 @@ import locationSVG from '../../assets/location.svg';
 import { MIN_LENGTH_FOR_LONG_WORDS } from '../ProfilePage/ProfilePage.js';
 import SectionGallery from './SectionGallery.js';
 import SectionOfferListingsMaybe from './SectionOfferListingsMaybe.js';
+import Share from '../../components/Share/Share.js';
 
 const MIN_LENGTH_FOR_LONG_WORDS_IN_TITLE = 16;
 
@@ -341,9 +342,26 @@ export const ListingPageComponent = props => {
       scrollingDisabled={scrollingDisabled}
       author={authorDisplayName}
       description={description}
-      facebookImages={facebookImages}
+      // facebookImages={facebookImages}
       twitterImages={twitterImages}
       className={css.pageWrapper}
+      socialSharing={{
+        title: intl.formatMessage({
+          id: 'ListingPage.ogTitle',
+        }, {
+          title,
+        }),
+        description: intl.formatMessage({
+          id: 'ListingPage.ogDescription',
+        }, {
+          title,
+        }),
+        images1200: [{
+          width: 1280,
+          height: 720,
+          url: 'https://cdn.prod.website-files.com/67388105e786c44d2fd25e83/6752e663a4801698954d151d_italiawork-social-sharing.jpg',
+        }],
+      }}
       schema={{
         '@context': 'http://schema.org',
         '@type': 'Product',
@@ -616,6 +634,115 @@ export const ListingPageComponent = props => {
               </Modal>
             </div>
           </div>
+
+            <SectionGallery
+              listing={currentListing}
+              variantPrefix={config.layout.listingImage.variantPrefix}
+            />
+
+            {/* <SectionReviews reviews={reviews} fetchReviewsError={fetchReviewsError} /> */}
+            {/* <SectionAuthorMaybe
+              title={title}
+              listing={currentListing}
+              authorDisplayName={authorDisplayName}
+              onContactUser={onContactUser}
+              isInquiryModalOpen={isAuthenticated && inquiryModalOpen}
+              onCloseInquiryModal={() => setInquiryModalOpen(false)}
+              sendInquiryError={sendInquiryError}
+              sendInquiryInProgress={sendInquiryInProgress}
+              onSubmitInquiry={onSubmitInquiry}
+              currentUser={currentUser}
+              onManageDisableScrolling={onManageDisableScrolling}
+            /> */}
+
+            {offerListingItems &&
+              Array.isArray(offerListingItems) &&
+              offerListingItems.length > 0 ? (
+              <SectionOfferListingsMaybe
+                listings={offerListingItems}
+                intl={intl}
+                onInitializeCardPaymentData={onInitializeCardPaymentData}
+                currentUser={currentUser}
+                callSetInitialValues={callSetInitialValues}
+                getListing={getListing}
+                isOwnListing={isOwnListing}
+              />
+            ) : null}
+          </div>
+          <div className={css.orderColumnForProductLayout}>
+            <OrderPanel
+              className={css.productOrderPanel}
+              listing={currentListing}
+              currentUser={currentUser}
+              routes={routeConfiguration}
+              isOwnListing={isOwnListing}
+              onSubmit={handleOrderSubmit}
+              authorLink={
+                <NamedLink
+                  className={css.authorNameLink}
+                  name="ListingPage"
+                  params={params}
+                  to={{ hash: '#author' }}
+                >
+                  {authorDisplayName}
+                </NamedLink>
+              }
+              title={<FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />}
+              titleDesktop={
+                <H4 as="h1" className={css.orderPanelTitle}>
+                  <FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />
+                </H4>
+              }
+              payoutDetailsWarning={payoutDetailsWarning}
+              author={ensuredAuthor}
+              onManageDisableScrolling={onManageDisableScrolling}
+              onContactUser={onContactUser}
+              monthlyTimeSlots={monthlyTimeSlots}
+              onFetchTimeSlots={onFetchTimeSlots}
+              onFetchTransactionLineItems={onFetchTransactionLineItems}
+              lineItems={lineItems}
+              fetchLineItemsInProgress={fetchLineItemsInProgress}
+              fetchLineItemsError={fetchLineItemsError}
+              validListingTypes={config.listing.listingTypes}
+              marketplaceCurrency={config.currency}
+              dayCountAvailableForBooking={config.stripe.dayCountAvailableForBooking}
+              marketplaceName={config.marketplaceName}
+              setInquiryModalOpen={setCustomInquiryModalOpen}
+            />
+            <Share
+              className={css.shareWrapper}
+              title={intl.formatMessage({
+                id: 'ListingPage.ogTitle',
+              }, {
+                title,
+              })}
+              description={intl.formatMessage({
+                id: 'ListingPage.ogDescription',
+              })}
+            />
+          </div>
+          <Modal
+            id="ListingPage.inquiry"
+            contentClassName={css.inquiryModalContent}
+            isOpen={isAuthenticated && customInquiryModalOpen}
+            onClose={() => setCustomInquiryModalOpen(false)}
+            usePortal
+            onManageDisableScrolling={onManageDisableScrolling}
+          >
+            <CustomInquiryForm
+              className={css.inquiryForm}
+              submitButtonWrapperClassName={css.inquirySubmitButtonWrapper}
+              listingTitle={title}
+              authorDisplayName={authorDisplayName}
+              sendInquiryError={sendInquiryError}
+              onSubmit={handleInquiryFormSubmit}
+              inProgress={sendInquiryInProgress}
+              marketplaceCurrency={config.currency}
+              offerPrice={price}
+              flex_price={Array.isArray(flex_price) && flex_price.length > 0}
+              listing={currentListing}
+            />
+          </Modal>
         </div>
       </LayoutSingleColumn>
     </Page>
