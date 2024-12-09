@@ -147,7 +147,7 @@ export const ListingPageComponent = props => {
     pushDataLayerEvent({
       dataLayer: {
         email: currentUser.attributes.email,
-        title,
+        title: currentListing.attributes.title,
         link: window.location.href,
       },
       dataLayerName: 'Listing_PageView',
