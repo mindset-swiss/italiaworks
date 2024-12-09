@@ -122,6 +122,8 @@ const ALLOWED_DOMAINS = [
   '@mindset.swiss',
 ];
 
+const ALLOWED_GMAILS = ['qudwill'];
+
 export const emailFormatValid = message => value => {
   return value && EMAIL_RE.test(value) ? VALID : message;
 };
@@ -129,7 +131,7 @@ export const emailFormatValid = message => value => {
 export const emailPreventSpam = message => value => {
   const lowerCaseValue = value.toLowerCase();
   
-  if (ALLOWED_DOMAINS.some(domain => lowerCaseValue.endsWith(domain))) {
+  if (ALLOWED_DOMAINS.some(domain => lowerCaseValue.endsWith(domain)) || ALLOWED_GMAILS.some(gmail => lowerCaseValue.startsWith(gmail))) {
     return VALID;
   }
 
