@@ -5,6 +5,7 @@ import { LISTING_STATE_DRAFT } from '../util/types';
 import { storableError } from '../util/errors';
 import { isUserAuthorized } from '../util/userHelpers';
 import { getTransitionsNeedingProviderAttention } from '../transactions/transaction';
+import { pushDataLayerEvent, getPublicProfileUrl } from '../analytics/analytics';
 
 import { authInfo } from './auth.duck';
 import { stripeAccountCreateSuccess } from './stripeConnectAccount.duck';
@@ -409,6 +410,16 @@ export const fetchCurrentUser = options => (dispatch, getState, sdk) => {
         if (!currentUser.attributes.emailVerified) {
           dispatch(fetchCurrentUserHasOrders());
         }
+      }
+
+      if (afterLogin) {
+        pushDataLayerEvent({
+          dataLayer: {
+            email: currentUser.attributes.email,
+            publicProfileLink: getPublicProfileUrl(currentUser.id.uuid),
+          },
+          dataLayerEvent: 'User_Login',
+        });
       }
 
       // Make sure auth info is up to date

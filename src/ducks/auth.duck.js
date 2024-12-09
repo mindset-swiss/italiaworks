@@ -2,6 +2,7 @@ import * as log from '../util/log';
 import { storableError } from '../util/errors';
 import { clearCurrentUser, fetchCurrentUser } from './user.duck';
 import { createUserWithIdp } from '../util/api';
+import { pushDataLayerEvent, getPublicProfileUrl } from '../analytics/analytics';
 
 const authenticated = authInfo => authInfo?.isAnonymous === false;
 const loggedInAs = authInfo => authInfo?.isLoggedInAs === true;
@@ -215,7 +216,17 @@ export const signup = params => (dispatch, getState, sdk) => {
   // do that automatically.
   return sdk.currentUser
     .create(params)
-    .then(() => dispatch(signupSuccess()))
+    .then((response) => {
+      const { password, ...paramsWithoutPassword } = params;
+      pushDataLayerEvent({
+        dataLayer: {
+          ...paramsWithoutPassword,
+          publicProfileLink: getPublicProfileUrl(response.data.data.id.uuid),
+        },
+        dataLayerName: 'User_Signup',
+      });
+      dispatch(signupSuccess());
+    })
     .then(() => dispatch(login(params.email, params.password)))
     .catch(e => {
       dispatch(signupError(storableError(e)));

@@ -1,3 +1,4 @@
+import TagManager from 'react-gtm-module';
 import { LOCATION_CHANGED } from '../ducks/routing.duck';
 
 // Create a Redux middleware from the given analytics handlers. Each
@@ -17,3 +18,16 @@ export const createMiddleware = handlers => store => next => action => {
 
   next(action);
 };
+
+export const pushDataLayerEvent = data => {
+  console.log(data);
+  
+  TagManager.initialize({
+    gtmId: process.env.REACT_APP_GOOGLE_ANALYTICS_ID,
+    dataLayerName: data.dataLayerName,
+  });
+
+  TagManager.dataLayer(data);
+};
+
+export const getPublicProfileUrl = uuid => `${process.env.REACT_APP_MARKETPLACE_ROOT_URL}/u/${uuid}`;
