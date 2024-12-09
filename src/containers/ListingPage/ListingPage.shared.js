@@ -16,6 +16,7 @@ import FooterContainer from '../../containers/FooterContainer/FooterContainer';
 
 import { getProcess } from '../../transactions/transaction';
 import { getTransactionTypeData } from '../CheckoutPage/CheckoutPageTransactionHelpers';
+import { pushDataLayerEvent } from '../../analytics/analytics';
 import css from './ListingPage.module.css';
 const { types } = require('sharetribe-flex-sdk');
 const { Money } = types;
@@ -311,6 +312,8 @@ export const handleSubmitCheckoutPageWithInquiry = props => values => {
     onInquiryWithoutPayment,
     onSubmitCallback,
     onCreateSellerListing,
+    currentUser,
+    title,
   } = props;
 
   const { message, offerPrice } = values;
@@ -333,6 +336,15 @@ export const handleSubmitCheckoutPageWithInquiry = props => values => {
       ...getTransactionTypeData(listingType, unitType, config),
     },
   };
+  
+  pushDataLayerEvent({
+    dataLayer: {
+      email: currentUser.attributes.email,
+      link: window.location.href,
+      title,
+    },
+    dataLayerName: 'Listing_OfferSubmit',
+  });
 
   // This makes a single transition directly to the API endpoint
   // (unlike in the payment-related processes, where call is proxied through the server to make privileged transition)

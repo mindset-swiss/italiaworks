@@ -324,6 +324,8 @@ export const ListingPageComponent = props => {
     onInquiryWithoutPayment,
     onSubmitCallback,
     onCreateSellerListing,
+    currentUser,
+    title,
   });
 
   const displayDate = selectedDate ? moment(selectedDate).format('dddd, MMMM Do YYYY') : null;
