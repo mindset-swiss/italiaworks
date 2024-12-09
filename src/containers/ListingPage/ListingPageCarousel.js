@@ -1,5 +1,5 @@
 import { array, arrayOf, bool, func, object, oneOf, shape, string } from 'prop-types';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { connect } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
 import { compose } from 'redux';
@@ -97,6 +97,7 @@ import locationSVG from '../../assets/location.svg';
 import { MIN_LENGTH_FOR_LONG_WORDS } from '../ProfilePage/ProfilePage.js';
 import SectionGallery from './SectionGallery.js';
 import SectionOfferListingsMaybe from './SectionOfferListingsMaybe.js';
+import { pushDataLayerEvent } from '../../analytics/analytics.js';
 
 const MIN_LENGTH_FOR_LONG_WORDS_IN_TITLE = 16;
 
@@ -141,6 +142,17 @@ export const ListingPageComponent = props => {
     onCreateSellerListing,
     offerListingItems,
   } = props;
+
+  useEffect(() => {
+    pushDataLayerEvent({
+      dataLayer: {
+        email: currentUser.attributes.email,
+        title,
+        link: window.location.href,
+      },
+      dataLayerName: 'Listing_PageView',
+    });
+  }, []);
 
   const listingConfig = config.listing;
   const listingId = new UUID(rawParams.id);
