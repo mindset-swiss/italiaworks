@@ -635,13 +635,13 @@ export const ListingPageComponent = props => {
             </div>
           </div>
 
-            <SectionGallery
-              listing={currentListing}
-              variantPrefix={config.layout.listingImage.variantPrefix}
-            />
+          <SectionGallery
+            listing={currentListing}
+            variantPrefix={config.layout.listingImage.variantPrefix}
+          />
 
-            {/* <SectionReviews reviews={reviews} fetchReviewsError={fetchReviewsError} /> */}
-            {/* <SectionAuthorMaybe
+          {/* <SectionReviews reviews={reviews} fetchReviewsError={fetchReviewsError} /> */}
+          {/* <SectionAuthorMaybe
               title={title}
               listing={currentListing}
               authorDisplayName={authorDisplayName}
@@ -655,95 +655,94 @@ export const ListingPageComponent = props => {
               onManageDisableScrolling={onManageDisableScrolling}
             /> */}
 
-            {offerListingItems &&
-              Array.isArray(offerListingItems) &&
-              offerListingItems.length > 0 ? (
-              <SectionOfferListingsMaybe
-                listings={offerListingItems}
-                intl={intl}
-                onInitializeCardPaymentData={onInitializeCardPaymentData}
-                currentUser={currentUser}
-                callSetInitialValues={callSetInitialValues}
-                getListing={getListing}
-                isOwnListing={isOwnListing}
-              />
-            ) : null}
-          </div>
-          <div className={css.orderColumnForProductLayout}>
-            <OrderPanel
-              className={css.productOrderPanel}
-              listing={currentListing}
+          {offerListingItems &&
+            Array.isArray(offerListingItems) &&
+            offerListingItems.length > 0 ? (
+            <SectionOfferListingsMaybe
+              listings={offerListingItems}
+              intl={intl}
+              onInitializeCardPaymentData={onInitializeCardPaymentData}
               currentUser={currentUser}
-              routes={routeConfiguration}
+              callSetInitialValues={callSetInitialValues}
+              getListing={getListing}
               isOwnListing={isOwnListing}
-              onSubmit={handleOrderSubmit}
-              authorLink={
-                <NamedLink
-                  className={css.authorNameLink}
-                  name="ListingPage"
-                  params={params}
-                  to={{ hash: '#author' }}
-                >
-                  {authorDisplayName}
-                </NamedLink>
-              }
-              title={<FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />}
-              titleDesktop={
-                <H4 as="h1" className={css.orderPanelTitle}>
-                  <FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />
-                </H4>
-              }
-              payoutDetailsWarning={payoutDetailsWarning}
-              author={ensuredAuthor}
-              onManageDisableScrolling={onManageDisableScrolling}
-              onContactUser={onContactUser}
-              monthlyTimeSlots={monthlyTimeSlots}
-              onFetchTimeSlots={onFetchTimeSlots}
-              onFetchTransactionLineItems={onFetchTransactionLineItems}
-              lineItems={lineItems}
-              fetchLineItemsInProgress={fetchLineItemsInProgress}
-              fetchLineItemsError={fetchLineItemsError}
-              validListingTypes={config.listing.listingTypes}
-              marketplaceCurrency={config.currency}
-              dayCountAvailableForBooking={config.stripe.dayCountAvailableForBooking}
-              marketplaceName={config.marketplaceName}
-              setInquiryModalOpen={setCustomInquiryModalOpen}
             />
-            <Share
-              className={css.shareWrapper}
-              title={intl.formatMessage({
-                id: 'ListingPage.ogTitle',
-              }, {
-                title,
-              })}
-              description={intl.formatMessage({
-                id: 'ListingPage.ogDescription',
-              })}
-            />
-          </div>
-          <Modal
-            id="ListingPage.inquiry"
-            contentClassName={css.inquiryModalContent}
-            isOpen={isAuthenticated && customInquiryModalOpen}
-            onClose={() => setCustomInquiryModalOpen(false)}
-            usePortal
-            onManageDisableScrolling={onManageDisableScrolling}
-          >
-            <CustomInquiryForm
-              className={css.inquiryForm}
-              submitButtonWrapperClassName={css.inquirySubmitButtonWrapper}
-              listingTitle={title}
-              authorDisplayName={authorDisplayName}
-              sendInquiryError={sendInquiryError}
-              onSubmit={handleInquiryFormSubmit}
-              inProgress={sendInquiryInProgress}
-              marketplaceCurrency={config.currency}
-              offerPrice={price}
-              flex_price={Array.isArray(flex_price) && flex_price.length > 0}
-              listing={currentListing}
-            />
-          </Modal>
+          ) : null}
         </div>
+        <div className={css.orderColumnForProductLayout}>
+          <OrderPanel
+            className={css.productOrderPanel}
+            listing={currentListing}
+            currentUser={currentUser}
+            routes={routeConfiguration}
+            isOwnListing={isOwnListing}
+            onSubmit={handleOrderSubmit}
+            authorLink={
+              <NamedLink
+                className={css.authorNameLink}
+                name="ListingPage"
+                params={params}
+                to={{ hash: '#author' }}
+              >
+                {authorDisplayName}
+              </NamedLink>
+            }
+            title={<FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />}
+            titleDesktop={
+              <H4 as="h1" className={css.orderPanelTitle}>
+                <FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />
+              </H4>
+            }
+            payoutDetailsWarning={payoutDetailsWarning}
+            author={ensuredAuthor}
+            onManageDisableScrolling={onManageDisableScrolling}
+            onContactUser={onContactUser}
+            monthlyTimeSlots={monthlyTimeSlots}
+            onFetchTimeSlots={onFetchTimeSlots}
+            onFetchTransactionLineItems={onFetchTransactionLineItems}
+            lineItems={lineItems}
+            fetchLineItemsInProgress={fetchLineItemsInProgress}
+            fetchLineItemsError={fetchLineItemsError}
+            validListingTypes={config.listing.listingTypes}
+            marketplaceCurrency={config.currency}
+            dayCountAvailableForBooking={config.stripe.dayCountAvailableForBooking}
+            marketplaceName={config.marketplaceName}
+            setInquiryModalOpen={setCustomInquiryModalOpen}
+          />
+          <Share
+            className={css.shareWrapper}
+            title={intl.formatMessage({
+              id: 'ListingPage.ogTitle',
+            }, {
+              title,
+            })}
+            description={intl.formatMessage({
+              id: 'ListingPage.ogDescription',
+            })}
+          />
+        </div>
+        <Modal
+          id="ListingPage.inquiry"
+          contentClassName={css.inquiryModalContent}
+          isOpen={isAuthenticated && customInquiryModalOpen}
+          onClose={() => setCustomInquiryModalOpen(false)}
+          usePortal
+          onManageDisableScrolling={onManageDisableScrolling}
+        >
+          <CustomInquiryForm
+            className={css.inquiryForm}
+            submitButtonWrapperClassName={css.inquirySubmitButtonWrapper}
+            listingTitle={title}
+            authorDisplayName={authorDisplayName}
+            sendInquiryError={sendInquiryError}
+            onSubmit={handleInquiryFormSubmit}
+            inProgress={sendInquiryInProgress}
+            marketplaceCurrency={config.currency}
+            offerPrice={price}
+            flex_price={Array.isArray(flex_price) && flex_price.length > 0}
+            listing={currentListing}
+          />
+        </Modal>
       </LayoutSingleColumn>
     </Page>
   );
