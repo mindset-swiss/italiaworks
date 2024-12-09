@@ -147,14 +147,16 @@ class RouteComponentRenderer extends Component {
       (!isEmailVerified(currentUser) && route.auth && route.path !== '/signup') ? (
         <Redirect to="/signup" />
       ) : (
-        <LoadableComponentErrorBoundary>
-          <RouteComponent
-            params={match.params}
-            location={location}
-            staticContext={staticContext}
-            {...extraProps}
-          />
-        </LoadableComponentErrorBoundary>
+        (route.path === '/' ? <Redirect to={currentUser ? '/s' : '/login'} /> : (
+          <LoadableComponentErrorBoundary>
+            <RouteComponent
+              params={match.params}
+              location={location}
+              staticContext={staticContext}
+              {...extraProps}
+            />
+          </LoadableComponentErrorBoundary>
+        ))
       )
     ) : isBannedFromAuthPages ? (
       <NamedRedirect name="LandingPage" />
