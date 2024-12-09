@@ -789,6 +789,7 @@
   "SignupForm.emailInvalid": "È richiesto un indirizzo email valido.",
   "SignupForm.emailLabel": "Email",
   "SignupForm.emailPlaceholder": "jane.doe@example.com",
+  "SignupForm.emailPreventSpam": "Email non valida. Prova di nuovo.",
   "SignupForm.emailRequired": "Devi aggiungere un'email.",
   "SignupForm.firstNameLabel": "Nome",
   "SignupForm.firstNamePlaceholder": "Jane",
