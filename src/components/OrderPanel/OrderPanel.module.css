@@ -292,36 +292,52 @@
 .customInquiryForm {
   display: flex;
   flex-direction: column;
-  gap: 28px;
-  padding: 32px;
+  gap: 16px;
+  padding: 24px 16px;
   text-align: start;
-  background-color: aliceblue;
+  background-color: #edf3ff;
   border-radius: 8px;
 }
 
 .customInquiryPrice {
   text-align: center;
   font-size: 40px;
+  line-height: 1.1;
+  letter-spacing: -1px;
   font-weight: bold;
   color: #1f57c3;
 }
 
 .customInquiryBudget {
-  font-family:sans-serif;
   text-align: center;
-  font-size: 16px;
+  font-size: 12px;
+  line-height: 1.33;
   font-weight: 700;
-  color: #4b4b4f;
+  color: var(--colorGrey700);
+  opacity: 0.5;
+  margin-bottom: 4px;
 }
 
 .customInquiryBudgetFlex {
-  font-family:sans-serif;
   text-align: center;
-  font-size: 14px;
+  font-size: 10px;
+  line-height: 1.6;
   font-weight: 400;
   color: #4b4b4f;
   display: flex;
-  gap: 12px;
+  gap: 4px;
   justify-content: center;
   align-items: center;
+}
+
+.description {
+  font-size: 12px;
+  line-height: 1.33;
+  max-width: 178px;
+  margin-left: auto;
+  margin-right: auto;
+
+  @media (--viewportMedium) {
+    max-width: 100%;
+  }
 }

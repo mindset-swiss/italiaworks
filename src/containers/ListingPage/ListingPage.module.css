@@ -72,20 +72,16 @@
 }
 
 .actionBarForProductLayout {
-  margin: 0;
-  width: 100%;
-
-  &:nth-child(even) {
-    margin-top: 24px;
-  }
+  padding: 16px 20px;
+  background: #72c3074d;
+  color: var(--colorGrey700);
+  align-items: center;
+  margin-bottom: 20px;
+  flex-direction: row;
+  border-radius: 4px;
 
   @media (--viewportMedium) {
-    margin: 24px 0 24px 0;
-    width: 100%;
-  }
-
-  @media (--viewportLarge) {
-    margin: 0 0 24px 0;
+    max-width: calc(100% - 237px);
   }
 }
 
@@ -97,6 +93,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
+  margin-bottom: 36px;
 }
 
 .actionBarForHeroLayout {
@@ -135,20 +132,9 @@
 }
 
 .ownListingText {
-  composes: h5 from global;
-  margin: 14px 24px 0 0;
-
-  @media (--viewportMedium) {
-    margin: 24px 24px 24px 0;
-  }
-
-  &.CTAEnabled {
-    margin-bottom: 0;
-
-    @media (--viewportMedium) {
-      margin: 24px 0 0px 0;
-    }
-  }
+  font-size: 12px;
+  line-height: 1.33;
+  margin: 0;
 }
 
 .noShrink {
@@ -173,24 +159,10 @@
 
 .addPayoutDetails,
 .editListingLink {
-  composes: h5 from global;
-  margin: 23px 24px 11px 0px;
-  color: var(--colorGrey100);
-
-  transition: var(--transitionStyleButton);
-
-  &:hover {
-    color: var(--colorWhite);
-    text-decoration: none;
-  }
-
-  @media (--viewportMedium) {
-    margin: 24px 0 0 0;
-  }
-
-  &.CTAEnabled {
-    margin: 24px 0 0 0;
-  }
+  margin: 0;
+  color: #4b4b4f;
+  font-size: 12px;
+  line-height: 1.33;
 }
 
 .missingPayoutDetailsText {
@@ -266,45 +238,29 @@
 }
 
 .mainColumnForProductLayout {
+  background: #ffffff;
+  
   @media (--viewportMedium) {
-  }
-  @media (--viewportLarge) {
-    /* contentContainer's full width - (orderColumn + paddings + margin) */
-    max-width: calc(100% - 360px);
-    flex-basis: calc(100% - 360px);
-    flex-shrink: 0;
-    flex-grow: 1;
+    width: calc(100% - 237px);
+    border-radius: 4px;
+    padding: 24px;
   }
 }
 
 .orderColumnForProductLayout {
   @media (--viewportMedium) {
+    width: 210px;
   }
   @media (--viewportLarge) {
-    display: block;
-    margin-left: 48px;
-    flex-basis: 312px;
-    flex-shrink: 0;
   }
 }
 
 .contentWrapperForProductLayout {
-  margin: 0 0 56px 0;
-
+  display: flex;
+  gap: 27px;
+  flex-direction: column;
   @media (--viewportMedium) {
-    width: 100%;
-    max-width: var(--contentMaxWidth);
-    padding: 0 24px 0 24px;
-    margin: 0 auto 56px auto;
-  }
-
-  @media (--viewportLarge) {
-    display: flex;
     flex-direction: row;
-    max-width: unset;
-    width: min(calc(var(--contentMaxWidth) + 72px), 100vw);
-    padding: 64px 36px 0 36px;
-    margin: 0 auto 117px auto;
   }
 }
 
@@ -352,14 +308,16 @@
 }
 
 .productOrderPanel {
+  margin: 40px 0;
+  
   @media (--viewportLarge) {
     display: block;
-    margin-top: 24px;
   }
-  /* Note: panel height might be too much on small viewport - hence min-height */
-  @media (--viewportLarge) and (min-height: 950px) {
-    position: sticky;
+
+  @media (--viewportMedium) {
+    margin: 0;
     top: 108px;
+    position: sticky;
   }
 }
 
@@ -469,23 +427,11 @@
   }
 }
 
-.author {
-  width: 100%;
-  composes: h5 from global;
-
-  margin-top: 7px;
-  margin-bottom: 0;
-
-  @media (--viewportMedium) {
-    margin-top: 0;
-    margin-bottom: 0;
-    color: var(--colorGrey700);
-  }
-}
-
 .authorNameLink {
-  composes: textSmall from global;
-  color: var(--colorGrey700);
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 500;
+  color: #1f57c3;
 }
 
 .contactWrapper {
@@ -531,12 +477,19 @@
 }
 
 .sectionText {
-  padding: 24px;
-  margin-bottom: 36px;
-
+  padding-top: 16px;
+  padding-bottom: 8px;
+  margin: 0;
+  p {
+    padding: 0;
+    font-size: 28px;
+    line-height: 1.1;
+    letter-spacing: -1px;
+  }
   @media (--viewportMedium) {
-    padding: 24px 0px;
-    margin-bottom: 40px;
+    p {
+      font-size: 32px;
+    }
   }
 }
 
@@ -603,7 +556,6 @@
 }
 
 .sectionMap {
-  padding: 0 24px;
   margin-bottom: 35px;
 
   @media (--viewportMedium) {
@@ -718,14 +670,13 @@
 }
 
 .productGallery {
-  margin: 0 0 36px 0;
+  margin-top: 24px;
+  margin-left: -16px;
+  margin-right: -16px;
 
   @media (--viewportMedium) {
-    margin: 24px 0 48px 0;
-  }
-  @media (--viewportLarge) {
-    margin: 0 0 40px 0;
-    padding-bottom: 4px;
+    margin-left: 0;
+    margin-right: 0;
   }
 }
 
@@ -778,23 +729,23 @@
 }
 
 .author {
-  composes: p from global;
-  margin: 0px 24px 32px 24px;
-
+  margin-top: 40px;
   display: flex;
-  flex-direction: row;
-  align-items: center;
-
-  @media (--viewportMedium) {
-    width: 100%;
-    margin: 12px 0 36px 0;
-    color: var(--colorGrey700);
-  }
+  align-items: flex-start;
+  gap: 12px;
 }
 
 .providerAvatar {
   display: flex;
-  margin-right: 10px;
+  width: 40px;
+  height: 40px;
+  background: #1f57c3;
+  span {
+    font-size: 14px;
+    line-height: 1.71;
+    letter-spacing: -0.09px;
+    font-weight: 700;
+  }
   /* display: none;
 
   @media (--viewportLarge) {
@@ -812,21 +763,23 @@
 }
 
 .providerNameLinked {
-  display: none;
+  /* display: none; */
+  display: inline;
 
-  @media (--viewportLarge) {
+  /* @media (--viewportLarge) {
     display: inline;
-  }
+  } */
 }
 
 .offerListingContent {
-  margin: 20px 0px;
+  margin: 16px 0px;
 }
 
 .offerListingAvatarContent {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 16px;
 }
 
 .offerListingAcceptOfferButton {
@@ -836,78 +789,99 @@
 
 .offerListingAcceptOfferContent {
   display: flex;
-  gap: 8px;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-end;
+  
+  @media (--viewportMedium) {
+    flex-direction: row;
+    gap: 15px;
+    align-items: center;
+  }
 }
 
 .offerListingPrice {
   font-weight: 700;
-  font-size: 28px;
+  font-size: 26px;
+  line-height: 1.1;
 }
 
 .offerListingDescriptionContent {
   border: 1px solid #d6d6d6;
   border-radius: 8px;
-  padding: 20px;
-  margin: 20px 0px;
-  font-size: 16px;
+  padding: 16px;
+  margin: 8px 0px 0;
+  font-size: 14px;
   font-weight: 500;
   line-height: 15.4px;
 }
 
 .projectTypeContent {
   display: flex;
-  gap: 20px;
+  gap: 12px;
   align-items: center;
-  margin: 20px;
-
-  @media (--viewportMedium) {
-    margin: 20px 0px;
-  }
+  margin: 20px 0;
 }
 
 .projectTypeTopic {
   font-size: 12px;
-  font-family: sans-serif;
-  color: #4b4b4f;
+  color: var(--colorGrey700);
+  line-height: 1.33;
+  font-family: var(--fontFamily);
+  opacity: 0.5;
+  margin-bottom: 2px;
 }
 
 .projectTypeTitle {
   font-weight: 500;
   font-size: 16px;
+  line-height: 1.5;
+}
+
+.capitalize {
+  text-transform: capitalize;
 }
 
 .marginContent {
-  margin: 24px;
-
-  @media (--viewportMedium) {
-    margin: 24px 0px;
+  margin-top: 40px;
+  h4 {
+    font-size: 20px;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin: 0 0 16px;
   }
 }
 
 .bio {
   /* Preserve newlines, but collapse other whitespace */
   white-space: pre-line;
-  margin: 5px 0 24px 0;
-
-  @media (--viewportMedium) {
-    margin: 4px 0 51px 0;
-  }
-  @media (--viewportLarge) {
-    margin: 0 0 56px 0;
-    max-width: 600px;
-  }
+  font-size: 14px;
+  line-height: 1.29;
+  padding: 0;
+  margin: 0;
 }
 
 .expandButton {
   color: #1f57c3 !important;
   cursor: pointer;
+  margin-top: 15px;
+  font-size: 14px;
+  line-height: 1.1;
 }
 
 .offerListingBio {
   /* Preserve newlines, but collapse other whitespace */
   white-space: pre-line;
-  margin: 6px 0 6px 0;
+  margin: 0;
+  padding: 0;
+  max-height: 46.2px;
+  font-weight: 500;
+  line-height: 1.1;
+  font-size: 14px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  display: -webkit-box;
 
   /* @media (--viewportMedium) {
     margin: 4px 0 51px 0;
@@ -918,15 +892,22 @@
   } */
 }
 
+.offerListingBio.expanded {
+  max-height: inherit;
+  display: block;
+}
+
 .disableOfferListingAcceptOfferButton {
   color: grey !important;
 }
 
 .sectionOfferListingContent {
-  margin: 24px;
-
-  @media (--viewportMedium) {
-    margin: 0px;
+  margin-top: 40px;
+  h4 {
+    font-size: 20px;
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin: 0 0 16px;
   }
 }
 
@@ -948,6 +929,53 @@
 
 .showFlex{
   display: flex;
-  gap: 8px;
-  align-items: center;
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.container {
+  width: 100%;
+  display: block;
+}
+
+.containerInner {
+  max-width: 1196px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 48px 16px;
+}
+
+.date {
+  font-size: 12px;
+  line-height: 1.33;
+  text-transform: capitalize;
+}
+
+.dateLabel {
+  font-weight: 700;
+}
+
+.pageWrapper {
+  @media (--viewportMedium) {
+    background: #fcfcfc;
+  }
+}
+
+.displayName {
+  font-size: 16px;
+  line-height: 1.5;
+  color: #1f57c3;
+}
+
+.mobileOnly {
+  @media (--viewportMedium) {
+    display: none;
+  }
+}
+
+.desktopOnly {
+  display: none;
+  @media (--viewportMedium) {
+    display: flex;
+  }
 }

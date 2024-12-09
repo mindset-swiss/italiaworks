@@ -74,6 +74,7 @@ export { default as ListingLink } from './ListingLink/ListingLink';
 export { default as LinkedLogo } from './Logo/LinkedLogo';
 export { default as PaginationLinks } from './PaginationLinks/PaginationLinks';
 export { default as ReviewRating } from './ReviewRating/ReviewRating';
+export { default as ReviewRatingCustom } from './ReviewRating/ReviewRatingCustom';
 
 // Menu
 export { default as Menu } from './Menu/Menu';
