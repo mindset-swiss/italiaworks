@@ -4,6 +4,7 @@ import { createImageVariantConfig } from '../../util/sdkLoader';
 import { parse } from '../../util/urlHelpers';
 
 import { fetchCurrentUser } from '../../ducks/user.duck';
+import { pushDataLayerEvent } from '../../analytics/analytics';
 
 // Pagination page size might need to be dynamic on responsive page layouts
 // Current design has max 3 columns 42 is divisible by 2 and 3
@@ -305,6 +306,16 @@ export const closeListing = listingId => (dispatch, getState, sdk) => {
     .close({ id: listingId }, { expand: true })
     .then(response => {
       dispatch(closeListingSuccess(response));
+
+      const state = getState();
+      
+      pushDataLayerEvent({
+        dataLayer: {
+          email: state.user.currentUser.attributes.email,
+        },
+        dataLayerName: 'Listing_Delete',
+      })
+
       return response;
     })
     .catch(e => {
