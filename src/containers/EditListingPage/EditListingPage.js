@@ -47,6 +47,7 @@ import {
 } from './EditListingPage.duck';
 import EditListingWizard from './EditListingWizard/EditListingWizard';
 import css from './EditListingPage.module.css';
+import { pushDataLayerEvent } from '../../analytics/analytics';
 
 const STRIPE_ONBOARDING_RETURN_URL_SUCCESS = 'success';
 const STRIPE_ONBOARDING_RETURN_URL_FAILURE = 'failure';
@@ -160,6 +161,20 @@ export const EditListingPageComponent = props => {
     // If page has already listingId (after submit) and current listings exist
     // redirect to listing page
     const listingSlug = currentListing ? createSlug(currentListing.attributes.title) : null;
+
+    pushDataLayerEvent({
+      dataLayer: {
+        email: currentUser.attributes.email,
+        listingLink: listingSlug,
+        price: currentListing.attributes.price.amount / 100,
+        title: currentListing.attributes.title,
+        selectedOption: currentListing.attributes.publicData.selectedOption,
+        selectedDate: currentListing.attributes.publicData.selectedDate,
+        projectType: currentListing.attributes.publicData.project_type,
+        address: currentListing.attributes.publicData?.location?.address,
+      },
+      dataLayerEvent: 'Listing_Submit',
+    });
 
     const redirectProps = isPendingApproval
       ? {
