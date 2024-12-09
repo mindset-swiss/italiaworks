@@ -421,6 +421,16 @@ export const fetchCurrentUser = options => (dispatch, getState, sdk) => {
           dataLayerEvent: 'User_Login',
         });
       }
+      
+      if (enforce) {
+        pushDataLayerEvent({
+          dataLayer: {
+            email: currentUser.attributes.email,
+            publicProfileUrl: getPublicProfileUrl(currentUser.id.uuid),
+          },
+          dataLayerName: 'User_EmailVerified',
+        });
+      }
 
       // Make sure auth info is up to date
       dispatch(authInfo());
