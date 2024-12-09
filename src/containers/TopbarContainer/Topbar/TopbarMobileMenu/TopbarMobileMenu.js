@@ -10,6 +10,7 @@ import { ACCOUNT_SETTINGS_PAGES } from '../../../../routing/routeConfiguration';
 import { FormattedMessage } from '../../../../util/reactIntl';
 import { propTypes } from '../../../../util/types';
 import { ensureCurrentUser } from '../../../../util/data';
+import { PROFILE_PAGE_PENDING_APPROVAL_VARIANT } from '../../../../util/urlHelpers';
 
 import {
   AvatarLarge,
@@ -152,6 +153,17 @@ const TopbarMobileMenu = props => {
           >
             <FormattedMessage id="TopbarMobileMenu.inboxLink" />
             {notificationCountBadge}
+          </NamedLink>
+          <NamedLink
+            className={classNames(css.navigationLink, currentPageClass('ProfilePageVariant'))}
+            name="ProfilePageVariant"
+            params={{
+              id: user.id.uuid,
+              variant: PROFILE_PAGE_PENDING_APPROVAL_VARIANT
+            }}
+          >
+            <span className={css.menuItemBorder} />
+            <FormattedMessage id="TopbarMobileMenu.yourProfilePage" />
           </NamedLink>
           <NamedLink
             className={classNames(css.navigationLink, currentPageClass('ManageListingsPage'))}
