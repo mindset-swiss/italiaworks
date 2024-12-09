@@ -329,6 +329,7 @@ export const fetchCurrentUserNotifications = () => (dispatch, getState, sdk) => 
  * @param {boolean} [options.updateNotifications] Make extra call for fetchCurrentUserNotifications()?
  * @param {boolean} [options.afterLogin]          Fetch is no-op for unauthenticated users except after login() call
  * @param {boolean} [options.enforce]             Enforce the call even if the currentUser entity is freshly fetched.
+ * @param {boolean} [options.emailVerification]   Optional paramneter for email verification process
  */
 export const fetchCurrentUser = options => (dispatch, getState, sdk) => {
   const state = getState();
@@ -339,6 +340,7 @@ export const fetchCurrentUser = options => (dispatch, getState, sdk) => {
     updateHasListings = true,
     updateNotifications = true,
     afterLogin,
+    emailVerification,
     enforce = false, // Automatic emailVerification might be called too fast
   } = options || {};
 
@@ -422,7 +424,7 @@ export const fetchCurrentUser = options => (dispatch, getState, sdk) => {
         });
       }
       
-      if (enforce) {
+      if (emailVerification) {
         pushDataLayerEvent({
           dataLayer: {
             email: currentUser.attributes.email,
