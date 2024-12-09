@@ -2,6 +2,7 @@ import toPairs from 'lodash/toPairs';
 import { types as sdkTypes } from './sdkLoader';
 import { diffInTime } from './dates';
 import { extractYouTubeID } from './string';
+import disposable from 'disposable-email';
 
 const { LatLng, Money } = sdkTypes;
 
@@ -112,8 +113,32 @@ export const bookingDatesRequired = (inValidStartDateMessage, inValidEndDateMess
 // Source: http://www.regular-expressions.info/email.html
 // See the link above for an explanation of the tradeoffs.
 const EMAIL_RE = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+const DISALLOWED_CHARACTERS = /[+%,/=\s]|(\.\.)/;
+
+const ALLOWED_DOMAINS = [
+  '@italiawork.it',
+  '@multimerce.co',
+  '@isaev.in',
+  '@mindset.swiss',
+];
+
+const ALLOWED_GMAILS = ['qudwill'];
 
 export const emailFormatValid = message => value => {
+  return value && EMAIL_RE.test(value) ? VALID : message;
+};
+
+export const emailPreventSpam = message => value => {
+  const lowerCaseValue = value.toLowerCase();
+  
+  if (ALLOWED_DOMAINS.some(domain => lowerCaseValue.endsWith(domain)) || ALLOWED_GMAILS.some(gmail => lowerCaseValue.startsWith(gmail))) {
+    return VALID;
+  }
+
+  if (DISALLOWED_CHARACTERS.test(value) || !disposable.validate(value)) {
+    return message;
+  }
+  
   return value && EMAIL_RE.test(value) ? VALID : message;
 };
 

@@ -19,6 +19,7 @@
     "core-js": "^3.22.5",
     "cors": "^2.8.5",
     "decimal.js": "^10.4.3",
+    "disposable-email": "^0.2.3",
     "dotenv": "^10.0.0",
     "dotenv-expand": "^5.1.0",
     "express": "^4.19.2",
