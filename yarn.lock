@@ -4035,6 +4035,11 @@
   resolved "https://registry.yarnpkg.com/@yarnpkg/lockfile/-/lockfile-1.1.0.tgz#e77a97fbd345b76d83245edcd17d393b1b41fb31"
   integrity sha512-GpSwvyXOcOOlV70vbnzjj4fW5xW/FdUF6nQEt1ENy7m4ZCczi1+/buVUPAqmGfqznsORNFzUMjctTIp8a9tuCQ==
 
+"@zerobounce/zero-bounce-sdk@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@zerobounce/zero-bounce-sdk/-/zero-bounce-sdk-1.1.2.tgz#bf6c21af74d1456ad454a8b864388cf97d764da3"
+  integrity sha512-gpeRjecIiY9YjO7GH4DXcHLZ9v4ifxAnDASmTKzDrHmTFodlckp78/HDUBsKRQZppZ5UmEslExBF1U47UAi56g==
+
 abab@^2.0.3:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/abab/-/abab-2.0.5.tgz#c0b678fb32d60fc1219c784d6a826fe385aeb79a"

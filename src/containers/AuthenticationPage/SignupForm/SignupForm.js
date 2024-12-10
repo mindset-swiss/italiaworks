@@ -130,7 +130,7 @@ const SignupFormComponent = props => (
                 placeholder={intl.formatMessage({
                   id: 'SignupForm.emailPlaceholder',
                 })}
-                validate={validators.composeValidators(emailRequired, emailValid, emailPreventSpam)}
+                validate={validators.composeAsyncValidators(emailRequired, emailValid, emailPreventSpam)}
               />
               <div className={css.name}>
                 <FieldTextInput

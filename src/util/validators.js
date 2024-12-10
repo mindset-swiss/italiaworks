@@ -2,7 +2,8 @@ import toPairs from 'lodash/toPairs';
 import { types as sdkTypes } from './sdkLoader';
 import { diffInTime } from './dates';
 import { extractYouTubeID } from './string';
-import disposable from 'disposable-email';
+import { isEmailDisposable } from '../../src/util/api';
+import { debounce } from 'lodash';
 
 const { LatLng, Money } = sdkTypes;
 
@@ -128,18 +129,46 @@ export const emailFormatValid = message => value => {
   return value && EMAIL_RE.test(value) ? VALID : message;
 };
 
-export const emailPreventSpam = message => value => {
+const isDisposable = debounce(async (email) => {
+  if (!email) {
+    return;
+  }
+
+  console.log('disposable validation');
+
+  try {
+    const response = await isEmailDisposable({
+      email,
+    });
+
+    return true;
+  } catch (err) {
+    console.error(err);
+
+    return false;
+  }
+}, 500);
+
+export const emailPreventSpam = message => async (value) => {
   const lowerCaseValue = value.toLowerCase();
+
+  console.log('validation preventSpam');
   
   if (ALLOWED_DOMAINS.some(domain => lowerCaseValue.endsWith(domain)) || ALLOWED_GMAILS.some(gmail => lowerCaseValue.startsWith(gmail))) {
     return VALID;
   }
 
-  if (DISALLOWED_CHARACTERS.test(value) || !disposable.validate(value)) {
+  if (DISALLOWED_CHARACTERS.test(value)) {
     return message;
   }
-  
-  return value && EMAIL_RE.test(value) ? VALID : message;
+
+  if (value && EMAIL_RE.test(value)) {
+    const result = await isDisposable(value);
+
+    return result ? message : VALID;
+  }
+
+  return message;
 };
 
 export const moneySubUnitAmountAtLeast = (message, minValue) => value => {
@@ -278,3 +307,17 @@ export const validSGID = message => value => {
 
 export const composeValidators = (...validators) => value =>
   validators.reduce((error, validator) => error || validator(value), VALID);
+
+export const composeAsyncValidators = (...validators) => async (value) => {
+  let error;
+
+  for (const validator of validators) {
+    error = await validator(value);
+
+    if (error) {
+      break;
+    }
+  }
+
+  return error || VALID;
+}

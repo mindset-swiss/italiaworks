@@ -149,3 +149,7 @@ export const createUserWithIdp = body => {
 export const getOfferListingbyListingId = body => {
   return post(`/api/offer-listing-page`, body);
 };
+
+export const isEmailDisposable = body => {
+  return post('/api/email/disposable', body);
+}
