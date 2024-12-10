@@ -3,6 +3,7 @@ import { bool, func, object, number, string } from 'prop-types';
 import classNames from 'classnames';
 
 import { FormattedMessage, intlShape } from '../../../../util/reactIntl';
+import { PROFILE_PAGE_PENDING_APPROVAL_VARIANT } from '../../../../util/urlHelpers';
 import { ACCOUNT_SETTINGS_PAGES } from '../../../../routing/routeConfiguration';
 import { propTypes } from '../../../../util/types';
 import {
@@ -70,6 +71,19 @@ const ProfileMenu = ({ currentPage, currentUser, onLogout }) => {
         <Avatar className={css.avatar} user={currentUser} disableProfileLink />
       </MenuLabel>
       <MenuContent className={css.profileMenuContent}>
+        <MenuItem key="ProfilePageVariant">
+          <NamedLink
+            className={classNames(css.menuLink, currentPageClass('ProfilePageVariant'))}
+            name="ProfilePageVariant"
+            params={{
+              id: currentUser.id.uuid,
+              variant: PROFILE_PAGE_PENDING_APPROVAL_VARIANT
+            }}
+          >
+            <span className={css.menuItemBorder} />
+            <FormattedMessage id="TopbarDesktop.yourProfilePage" />
+          </NamedLink>
+        </MenuItem>
         <MenuItem key="ManageListingsPage">
           <NamedLink
             className={classNames(css.menuLink, currentPageClass('ManageListingsPage'))}
