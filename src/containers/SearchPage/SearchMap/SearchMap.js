@@ -31,6 +31,25 @@ const getSearchMapVariantHandles = mapProvider => {
 };
 const getFitMapToBounds = mapProvider => {
   const searchMapVariant = getSearchMapVariant(mapProvider);
+
+  if (mapProvider === 'googleMaps') {
+    return (mapRef, bounds, options) => {
+      if (!bounds) {
+        const latLngBounds = new google.maps.LatLngBounds();
+
+        listings.forEach(listing => {
+          const { lat, lng } = listing.attributes.geolocation;
+
+          latLngBounds.extend(new google.maps.LatLng(lat, lng));
+        });
+
+        mapRef.fitBounds(latLngBounds, options);
+      } else {
+        mapRef.fitBounds(bounds, options);
+      }
+    };
+  }
+
   return searchMapVariant.fitMapToBounds;
 };
 const getSearchMapVariantComponent = mapProvider => {
@@ -128,7 +147,7 @@ export class SearchMapComponent extends Component {
     if (this.mapRef && this.state.mapReattachmentCount === 0) {
       // map is ready, let's fit search area's bounds to map's viewport
       const fitMapToBounds = getFitMapToBounds(this.props.config.maps.mapProvider);
-      fitMapToBounds(this.mapRef, this.props.bounds, { padding: 0, isAutocompleteSearch: true });
+      fitMapToBounds(this.mapRef, this.props.bounds, { padding: 50, isAutocompleteSearch: true });
     }
   }
 
