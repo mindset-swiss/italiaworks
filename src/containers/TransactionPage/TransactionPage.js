@@ -265,6 +265,8 @@ export const TransactionPageComponent = props => {
         };
     const params = { reviewRating: rating, reviewContent };
 
+    console.log(transactionRole);
+
     onSendReview(transaction, transitionOptions, params, config)
       .then(r => {
         setReviewModalOpen(false);
@@ -277,7 +279,17 @@ export const TransactionPageComponent = props => {
             jobTitle: listing?.attributes?.title,
           },
           dataLayerName: 'Listing_ReviewSubmit',
-        })
+        });
+
+        if (transactionRole === CUSTOMER) {
+          pushDataLayerEvent({
+            dataLayer: {
+              email: currentUser.attributes.email,
+              jobTitle: listing?.attributes?.title,
+            },
+            dataLayerName: 'Listing_JobClosed',
+          });
+        }
       })
       .catch(e => {
         // Do nothing.
