@@ -58,7 +58,7 @@ const ListingCard = props => {
           [css.borderRadiusInheritBottom]: !isInCarousel,
         })}
       >
-        <AspectRatioWrapper
+        {/* <AspectRatioWrapper
           className={css.aspectRatioWrapper}
           width={aspectWidth}
           height={aspectHeight}
@@ -71,7 +71,7 @@ const ListingCard = props => {
             variants={variants}
             sizes="250px"
           />
-        </AspectRatioWrapper>
+        </AspectRatioWrapper> */}
         <div className={classNames(css.info, { [css.borderRadiusInheritBottom]: !isInCarousel })}>
           <div className={classNames(css.price, { [css.noPriceSetLabel]: !formattedPrice })}>
             {formattedPrice}

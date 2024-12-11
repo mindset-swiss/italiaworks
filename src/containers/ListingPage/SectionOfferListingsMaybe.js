@@ -135,16 +135,18 @@ const SectionOfferListingsMaybe = props => {
                           </div>
                         </div>
                         <div className={css.offerListingAcceptOfferContent}>
-                          <div
-                            className={
-                              listingIsPublishedByUser
-                                ? css.disableOfferListingAcceptOfferButton
-                                : css.offerListingAcceptOfferButton
-                            }
-                            onClick={listingIsPublishedByUser ? () => { } : handleSubmit}
-                          >
-                            <FormattedMessage id="ListingPage.acceptOfferButton" />
-                          </div>
+                          {!listingIsPublishedByUser && (
+                            <div
+                              className={
+                                listingIsPublishedByUser
+                                  ? css.disableOfferListingAcceptOfferButton
+                                  : css.offerListingAcceptOfferButton
+                              }
+                              onClick={listingIsPublishedByUser ? () => { } : handleSubmit}
+                            >
+                              <FormattedMessage id="ListingPage.acceptOfferButton" />
+                            </div>
+                          )}
                           <div className={css.offerListingPrice}>{formattedPrice}</div>
                         </div>
                       </div>

@@ -131,6 +131,10 @@ export const SingleDatePicker = props => {
     ...(readOnly ? { readOnly } : {}),
   };
 
+  const capitalizeFirstLetter = val => {
+    return `${String(val).charAt(0).toUpperCase()}${String(val).slice(1)}`;
+  }
+
   return (
     <OutsideClickHandler className={classes} onOutsideClick={handleBlur}>
       <div id={pickerId} onKeyDown={handleKeyDown} ref={element}>
@@ -144,7 +148,7 @@ export const SingleDatePicker = props => {
           <input
             id={id}
             className={classNames(css.input, { [css.inputPlaceholder]: !value })}
-            placeholder={placeholderText}
+            placeholder={capitalizeFirstLetter(placeholderText)}
             value={dateData.formatted}
             {...inputProps}
           />

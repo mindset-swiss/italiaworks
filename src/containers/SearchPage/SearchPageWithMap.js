@@ -414,6 +414,20 @@ export class SearchPageComponent extends Component {
       config
     );
 
+    const adjustedBounds = bounds ? bounds : {
+      _sdkType: 'LatLngBounds',
+      ne: {
+        _sdkType: 'LatLng',
+        lat: 47.092,
+        lng: 18.513,
+      },
+      sw: {
+        _sdkType: 'LatLng',
+        lat: 36.619,
+        lng: 6.614,
+      }
+    };
+
     // Set topbar class based on if a modal is open in
     // a child component
     const topbarClasses = this.state.isMobileModalOpen
@@ -572,7 +586,7 @@ export class SearchPageComponent extends Component {
                 <SearchMap
                   reusableContainerClassName={css.map}
                   activeListingId={activeListingId}
-                  bounds={bounds}
+                  bounds={adjustedBounds}
                   center={origin}
                   isSearchMapOpenOnMobile={this.state.isSearchMapOpenOnMobile}
                   location={location}
