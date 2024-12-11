@@ -5,6 +5,7 @@ import {
   fetchStripeAccount,
 } from '../../ducks/stripeConnectAccount.duck';
 import { fetchCurrentUser } from '../../ducks/user.duck';
+import { getPublicProfileUrl, pushDataLayerEvent } from '../../analytics/analytics';
 
 // ================ Action types ================ //
 
@@ -65,6 +66,17 @@ export const savePayoutDetails = (values, isUpdateCall) => (dispatch, getState, 
   return dispatch(upsertThunk(values, { expand: true }))
     .then(response => {
       dispatch(savePayoutDetailsSuccess());
+      
+      const state = getState();
+      
+      pushDataLayerEvent({
+        dataLayer: {
+          email: state.user.currentUser.attributes.email,
+          publicProfileUrl: getPublicProfileUrl(state.user.currentUser.id.uuid),
+        },
+        dataLayerName: 'User_PaymentVerified',
+      })
+
       return response;
     })
     .catch(() => dispatch(savePayoutDetailsError()));

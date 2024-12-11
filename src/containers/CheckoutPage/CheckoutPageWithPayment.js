@@ -34,6 +34,7 @@ import MobileListingImage from './MobileListingImage';
 import MobileOrderBreakdown from './MobileOrderBreakdown';
 
 import css from './CheckoutPage.module.css';
+import { pushDataLayerEvent } from '../../analytics/analytics.js';
 
 // Stripe PaymentIntent statuses, where user actions are already completed
 // https://stripe.com/docs/payments/payment-intents/status
@@ -263,6 +264,14 @@ const handleSubmit = (values, process, props, stripe, submitting, setSubmitting)
 
       setOrderPageInitialValues(initialValues, routeConfiguration, dispatch);
       onSubmitCallback();
+
+      pushDataLayerEvent({
+        dataLayer: {
+          email: currentUser.attributes.email,
+        },
+        dataLayerName: 'Listing_PaymentComplete',
+      });
+
       history.push(orderDetailsPath);
     })
     .catch(err => {

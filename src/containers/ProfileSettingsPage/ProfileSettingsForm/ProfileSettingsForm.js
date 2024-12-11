@@ -12,6 +12,7 @@ import { propTypes } from '../../../util/types';
 import * as validators from '../../../util/validators';
 import { isUploadImageOverLimitError } from '../../../util/errors';
 import { getPropsForCustomUserFieldInputs } from '../../../util/userHelpers';
+import { getPublicProfileUrl, pushDataLayerEvent } from '../../../analytics/analytics';
 
 import {
   Form,
@@ -279,6 +280,14 @@ class ProfileSettingsFormComponent extends Component {
                       if (file != null) {
                         const tempId = `${file.name}_${Date.now()}`;
                         onImageUpload({ id: tempId, file });
+
+                        pushDataLayerEvent({
+                          dataLayer: {
+                            email: currentUser.attributes.email,
+                            publicProfileLink: getPublicProfileUrl(currentUser.id.uuid),
+                          },
+                          dataLayerEvent: 'User_ProfilePhotoUpload',
+                        });
                       }
                     };
 

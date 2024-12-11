@@ -63,6 +63,7 @@ import {
 } from './TransactionPage.duck';
 import css from './TransactionPage.module.css';
 import { hasPermissionToViewData } from '../../util/userHelpers.js';
+import { pushDataLayerEvent } from '../../analytics/analytics.js';
 
 // Submit dispute and close the review modal
 const onDisputeOrder = (
@@ -264,10 +265,31 @@ export const TransactionPageComponent = props => {
         };
     const params = { reviewRating: rating, reviewContent };
 
+    console.log(transactionRole);
+
     onSendReview(transaction, transitionOptions, params, config)
       .then(r => {
         setReviewModalOpen(false);
         setReviewSubmitted(true);
+
+        pushDataLayerEvent({
+          dataLayer: {
+            email: currentUser.attributes.email,
+            rating,
+            jobTitle: listing?.attributes?.title,
+          },
+          dataLayerName: 'Listing_ReviewSubmit',
+        });
+
+        if (transactionRole === CUSTOMER) {
+          pushDataLayerEvent({
+            dataLayer: {
+              email: currentUser.attributes.email,
+              jobTitle: listing?.attributes?.title,
+            },
+            dataLayerName: 'Listing_JobClosed',
+          });
+        }
       })
       .catch(e => {
         // Do nothing.

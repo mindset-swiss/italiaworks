@@ -20,6 +20,7 @@ import PaymentMethodsForm from './PaymentMethodsForm/PaymentMethodsForm';
 import { createStripeSetupIntent, stripeCustomer } from './PaymentMethodsPage.duck.js';
 
 import css from './PaymentMethodsPage.module.css';
+import { getPublicProfileUrl, pushDataLayerEvent } from '../../analytics/analytics.js';
 
 const PaymentMethodsPageComponent = props => {
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -104,6 +105,14 @@ const PaymentMethodsPageComponent = props => {
         fetchStripeCustomer();
         setIsSubmitting(false);
         setCardState('default');
+
+        pushDataLayerEvent({
+          dataLayer: {
+            email: currentUser.attributes.email,
+            publicProfileUrl: getPublicProfileUrl(currentUser.id.uuid),
+          },
+          dataLayerName: 'User_PaymentVerified',
+        });
       })
       .catch(error => {
         console.error(error);

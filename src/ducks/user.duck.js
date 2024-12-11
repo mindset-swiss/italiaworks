@@ -5,6 +5,7 @@ import { LISTING_STATE_DRAFT } from '../util/types';
 import { storableError } from '../util/errors';
 import { isUserAuthorized } from '../util/userHelpers';
 import { getTransitionsNeedingProviderAttention } from '../transactions/transaction';
+import { pushDataLayerEvent, getPublicProfileUrl } from '../analytics/analytics';
 
 import { authInfo } from './auth.duck';
 import { stripeAccountCreateSuccess } from './stripeConnectAccount.duck';
@@ -328,6 +329,7 @@ export const fetchCurrentUserNotifications = () => (dispatch, getState, sdk) => 
  * @param {boolean} [options.updateNotifications] Make extra call for fetchCurrentUserNotifications()?
  * @param {boolean} [options.afterLogin]          Fetch is no-op for unauthenticated users except after login() call
  * @param {boolean} [options.enforce]             Enforce the call even if the currentUser entity is freshly fetched.
+ * @param {boolean} [options.emailVerification]   Optional paramneter for email verification process
  */
 export const fetchCurrentUser = options => (dispatch, getState, sdk) => {
   const state = getState();
@@ -338,6 +340,7 @@ export const fetchCurrentUser = options => (dispatch, getState, sdk) => {
     updateHasListings = true,
     updateNotifications = true,
     afterLogin,
+    emailVerification,
     enforce = false, // Automatic emailVerification might be called too fast
   } = options || {};
 
@@ -409,6 +412,26 @@ export const fetchCurrentUser = options => (dispatch, getState, sdk) => {
         if (!currentUser.attributes.emailVerified) {
           dispatch(fetchCurrentUserHasOrders());
         }
+      }
+
+      if (afterLogin) {
+        pushDataLayerEvent({
+          dataLayer: {
+            email: currentUser.attributes.email,
+            publicProfileLink: getPublicProfileUrl(currentUser.id.uuid),
+          },
+          dataLayerEvent: 'User_Login',
+        });
+      }
+      
+      if (emailVerification) {
+        pushDataLayerEvent({
+          dataLayer: {
+            email: currentUser.attributes.email,
+            publicProfileUrl: getPublicProfileUrl(currentUser.id.uuid),
+          },
+          dataLayerName: 'User_EmailVerified',
+        });
       }
 
       // Make sure auth info is up to date
