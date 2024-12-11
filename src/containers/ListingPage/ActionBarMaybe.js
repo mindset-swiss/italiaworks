@@ -102,7 +102,7 @@ export const ActionBarMaybe = props => {
       ownListingTextTranslationId = 'ListingPage.ownListingDraft';
     }
 
-    const message = isDraft ? 'ListingPage.finishListing' : 'ListingPage.editListing';
+    const message = isDraft ? 'ListingPage.finishListing' : 'ListingPage.editListingShort';
 
     const ownListingTextClasses = classNames(css.ownListingText, {
       [css.ownListingTextPendingApproval]: isPendingApproval,
@@ -110,6 +110,8 @@ export const ActionBarMaybe = props => {
 
     const hasValidType = approvalToPublishOptions?.type && approvalToPublishOptions.type !== 'none';
     const isCTAEnabled = hasValidType && isPendingApproval;
+
+    console.log(message);
 
     return (
       <div
@@ -126,7 +128,7 @@ export const ActionBarMaybe = props => {
             name="EditListingPage"
             params={editParams}
           >
-            <EditIcon className={css.editIcon} />
+            {!!(message !== 'ListingPage.editListingShort') && <EditIcon className={css.editIcon} />}
             <FormattedMessage id={message} />
           </NamedLink>
           <CTAButtonMaybe

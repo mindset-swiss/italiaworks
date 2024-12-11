@@ -1,0 +1,19 @@
+.wrapper {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+  font-size: 16px;
+  line-height: 1.5;
+  color: var(--colorGrey700);
+}
+
+.rating {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  color: #ed9f21;
+}
+
+.counter {
+  opacity: 0.5;
+}

@@ -1024,7 +1024,7 @@ textarea {
   /* button defaults */
   display: block;
   width: 100%;
-  min-height: 56px;
+  min-height: 50px;
   margin: 0;
 
   /* Padding is only for <a> elements where button styles are applied,
@@ -1053,6 +1053,9 @@ textarea {
   /* Primary button uses success color */
   background-color: var(--colorPrimaryButton);
   color: var(--colorWhite);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.29;
 
   @media (--viewportMedium) {
     padding: 20px 0 20px 0;

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import ReactImageGallery from 'react-image-gallery';
@@ -52,6 +52,7 @@ const getFirstImageAspectRatio = (firstImage, scaledVariant) => {
 
 const ListingImageGallery = props => {
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const galleryRef = useRef(null);
   const { intl, rootClassName, className, images, imageVariants, thumbnailVariants } = props;
   const thumbVariants = thumbnailVariants || imageVariants;
   // imageVariants are scaled variants.
@@ -97,13 +98,13 @@ const ListingImageGallery = props => {
   };
   const renderThumbInner = item => {
     return (
-      <div>
+      <div onClick={() => galleryRef.current.toggleFullScreen()}>
         <ResponsiveImage
           rootClassName={css.thumb}
           image={item.image}
           alt={item.thumbAlt}
           variants={thumbVariants}
-          sizes="88px"
+          sizes="136px"
         />
       </div>
     );
@@ -161,6 +162,7 @@ const ListingImageGallery = props => {
 
   return (
     <ReactImageGallery
+      ref={galleryRef}
       additionalClass={classes}
       items={items}
       renderItem={renderItem}

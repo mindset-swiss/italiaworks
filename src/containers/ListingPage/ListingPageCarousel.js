@@ -327,12 +327,14 @@ export const ListingPageComponent = props => {
     onCreateSellerListing,
   });
 
-  const displayDate = selectedDate ? moment(selectedDate).format('dddd, MMMM Do YYYY') : null;
+  const displayDate = selectedDate ? moment(selectedDate).format('dddd D MMMM, YYYY') : null;
   const descriptionWithLinks = richText(description, {
     linkify: true,
     longWordMinLength: MIN_LENGTH_FOR_LONG_WORDS,
     longWordClass: css.longWord,
   });
+
+  const publishDate = moment(currentListing.attributes.createdAt).format('dddd D MMMM, YYYY');
 
   return (
     <Page
@@ -342,6 +344,7 @@ export const ListingPageComponent = props => {
       description={description}
       // facebookImages={facebookImages}
       twitterImages={twitterImages}
+      className={css.pageWrapper}
       socialSharing={{
         title: intl.formatMessage({
           id: 'ListingPage.ogTitle',
@@ -374,8 +377,8 @@ export const ListingPageComponent = props => {
       }}
     >
       <LayoutSingleColumn className={css.pageRoot} topbar={topbar} footer={<FooterContainer />}>
-        <div className={css.contentWrapperForProductLayout}>
-          <div className={css.mainColumnForProductLayout}>
+        <div className={css.container}>
+          <div className={css.containerInner}>
             {currentListing.id && noPayoutDetailsSetWithOwnListing ? (
               <ActionBarMaybe
                 className={css.actionBarForProductLayout}
@@ -399,111 +402,246 @@ export const ListingPageComponent = props => {
                 }}
               />
             ) : null}
-            {/* <div className={css.mobileHeading}>
-              <H4 as="h1" className={css.orderPanelTitle}>
-                <FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />
-              </H4>
-            </div> */}
-            <SectionTextMaybe text={title} showAsIngress />
-            {/* <SectionTextMaybe text={description} showAsIngress /> */}
+            <div className={css.contentWrapperForProductLayout}>
+              <div className={css.mainColumnForProductLayout}>
 
-            <div className={css.author}>
-              <AvatarMedium user={ensuredAuthor} className={css.providerAvatar} />
-              <span className={css.providerNameLinked}>
-                <FormattedMessage
-                  id="OrderPanel.author"
-                  values={{
-                    name: (
-                      <NamedLink
-                        className={css.authorNameLink}
-                        name="ListingPage"
-                        params={params}
-                        to={{ hash: '#author' }}
-                      >
-                        {authorDisplayName}
-                      </NamedLink>
-                    ),
-                  }}
-                />
-              </span>
-              <span className={css.providerNamePlain}>
-                <FormattedMessage id="OrderPanel.author" values={{ name: authorDisplayName }} />
-              </span>
-            </div>
-
-            {/* <CustomListingFields
-              publicData={publicData}
-              metadata={metadata}
-              listingFieldConfigs={listingConfig.listingFields}
-              categoryConfiguration={config.categoryConfiguration}
-              intl={intl}
-            /> */}
-
-            {project_type && project_type === 'online' ? (
-              <div className={css.projectTypeContent}>
-                <div>
-                  <img src={locationSVG} />
+                {/* <div className={css.mobileHeading}>
+                  <H4 as="h1" className={css.orderPanelTitle}>
+                    <FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />
+                  </H4>
+                </div> */}
+                <SectionTextMaybe text={title} showAsIngress />
+                <div className={css.date}>
+                  <span className={css.dateLabel}>
+                    <FormattedMessage id="ListingPage.ListingPageCarousel.publishDate" />
+                  </span>
+                  <span> {publishDate}</span>
                 </div>
-                <div>
-                  <div className={css.projectTypeTopic}>
-                    <FormattedMessage id="ListingPage.ListingPageCarousel.working" />
-                  </div>
-                  <div className={css.projectTypeTitle}>{project_type}</div>
+                {/* <SectionTextMaybe text={description} showAsIngress /> */}
+
+                <div className={css.author}>
+                  <AvatarMedium user={ensuredAuthor} className={css.providerAvatar} />
+                  <span className={css.providerNameLinked}>
+                    <FormattedMessage
+                      id="OrderPanel.author"
+                      values={{
+                        name: (
+                          <NamedLink
+                            className={css.authorNameLink}
+                            name="ListingPage"
+                            params={params}
+                            to={{ hash: '#author' }}
+                          >
+                            {authorDisplayName}
+                          </NamedLink>
+                        ),
+                      }}
+                    />
+                  </span>
+                  {/* <span className={css.providerNamePlain}>
+                    <FormattedMessage id="OrderPanel.author" values={{ name: authorDisplayName }} />
+                  </span> */}
                 </div>
-              </div>
-            ) : (
-              <div>
-                <div className={css.projectTypeContent}>
-                  <div>
-                    <img src={locationSVG} />
-                  </div>
-                  <div>
-                    <div className={css.projectTypeTopic}>
-                      <FormattedMessage id="ListingPage.ListingPageCarousel.working" />
+
+                {/* <CustomListingFields
+                  publicData={publicData}
+                  metadata={metadata}
+                  listingFieldConfigs={listingConfig.listingFields}
+                  categoryConfiguration={config.categoryConfiguration}
+                  intl={intl}
+                /> */}
+
+                {!!currentListing.attributes.publicData?.location?.address && (
+                  <div className={css.projectTypeContent}>
+                    <div>
+                      <img src={locationSVG} />
                     </div>
-                    <div className={css.projectTypeTitle}>{project_type}</div>
+                    <div>
+                      <div className={css.projectTypeTopic}>
+                        <FormattedMessage id="ListingPage.ListingPageCarousel.working" />
+                      </div>
+                      <div className={css.projectTypeTitle}>{currentListing.attributes.publicData.location.address}</div>
+                    </div>
                   </div>
-                </div>
-              </div>
-            )}
+                )}
 
-            {displayDate ? (
-              <div className={css.projectTypeContent}>
-                <div>
-                  <img src={dateSVG} />
-                </div>
-                <div>
-                  <div className={css.projectTypeTopic}>
-                    <FormattedMessage id="ListingPage.ListingPageCarousel.date" />
+                {displayDate ? (
+                  <div className={css.projectTypeContent}>
+                    <div>
+                      <img src={dateSVG} />
+                    </div>
+                    <div>
+                      <div className={css.projectTypeTopic}>
+                        <FormattedMessage id="ListingPage.ListingPageCarousel.date" />
+                      </div>
+                      <div className={`${css.projectTypeTitle} ${css.capitalize}`}>{displayDate}</div>
+                    </div>
                   </div>
-                  <div className={css.projectTypeTitle}>{displayDate}</div>
+                ) : null}
+
+                <OrderPanel
+                  className={`${css.productOrderPanel} ${css.mobileOnly}`}
+                  listing={currentListing}
+                  currentUser={currentUser}
+                  routes={routeConfiguration}
+                  isOwnListing={isOwnListing}
+                  onSubmit={handleOrderSubmit}
+                  authorLink={
+                    <NamedLink
+                      className={css.authorNameLink}
+                      name="ListingPage"
+                      params={params}
+                      to={{ hash: '#author' }}
+                    >
+                      {authorDisplayName}
+                    </NamedLink>
+                  }
+                  title={<FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />}
+                  titleDesktop={
+                    <H4 as="h1" className={css.orderPanelTitle}>
+                      <FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />
+                    </H4>
+                  }
+                  payoutDetailsWarning={payoutDetailsWarning}
+                  author={ensuredAuthor}
+                  onManageDisableScrolling={onManageDisableScrolling}
+                  onContactUser={onContactUser}
+                  monthlyTimeSlots={monthlyTimeSlots}
+                  onFetchTimeSlots={onFetchTimeSlots}
+                  onFetchTransactionLineItems={onFetchTransactionLineItems}
+                  lineItems={lineItems}
+                  fetchLineItemsInProgress={fetchLineItemsInProgress}
+                  fetchLineItemsError={fetchLineItemsError}
+                  validListingTypes={config.listing.listingTypes}
+                  marketplaceCurrency={config.currency}
+                  dayCountAvailableForBooking={config.stripe.dayCountAvailableForBooking}
+                  marketplaceName={config.marketplaceName}
+                  setInquiryModalOpen={setCustomInquiryModalOpen}
+                />
+
+                {project_type && project_type !== 'online' ? (
+                  <SectionMapMaybe
+                    geolocation={geolocation}
+                    publicData={publicData}
+                    listingId={currentListing.id}
+                    mapsConfig={config.maps}
+                  />
+                ) : null}
+
+                <div className={css.marginContent}>
+                  <H4>
+                    <FormattedMessage id="ListingPage.ListingPageCarousel.detailsTitle" />
+                  </H4>
+                  <p className={css.bio}>{descriptionWithLinks}</p>
                 </div>
+
+                <SectionGallery
+                  listing={currentListing}
+                  variantPrefix={config.layout.listingImage.variantPrefix}
+                />
+
+                {/* <SectionReviews reviews={reviews} fetchReviewsError={fetchReviewsError} /> */}
+                {/* <SectionAuthorMaybe
+                  title={title}
+                  listing={currentListing}
+                  authorDisplayName={authorDisplayName}
+                  onContactUser={onContactUser}
+                  isInquiryModalOpen={isAuthenticated && inquiryModalOpen}
+                  onCloseInquiryModal={() => setInquiryModalOpen(false)}
+                  sendInquiryError={sendInquiryError}
+                  sendInquiryInProgress={sendInquiryInProgress}
+                  onSubmitInquiry={onSubmitInquiry}
+                  currentUser={currentUser}
+                  onManageDisableScrolling={onManageDisableScrolling}
+                /> */}
+
+                {offerListingItems &&
+                  Array.isArray(offerListingItems) &&
+                  offerListingItems.length > 0 ? (
+                  <SectionOfferListingsMaybe
+                    listings={offerListingItems}
+                    intl={intl}
+                    onInitializeCardPaymentData={onInitializeCardPaymentData}
+                    currentUser={currentUser}
+                    callSetInitialValues={callSetInitialValues}
+                    getListing={getListing}
+                    isOwnListing={isOwnListing}
+                  />
+                ) : null}
               </div>
-            ) : null}
-
-            {project_type && project_type !== 'online' ? (
-              <SectionMapMaybe
-                geolocation={geolocation}
-                publicData={publicData}
-                listingId={currentListing.id}
-                mapsConfig={config.maps}
-              />
-            ) : null}
-
-            <div className={css.marginContent}>
-              <H4>
-                <FormattedMessage id="ListingPage.ListingPageCarousel.detailsTitle" />
-              </H4>
-              <p className={css.bio}>{descriptionWithLinks}</p>
+              <div className={css.orderColumnForProductLayout}>
+                <OrderPanel
+                  className={`${css.productOrderPanel} ${css.desktopOnly}`}
+                  listing={currentListing}
+                  currentUser={currentUser}
+                  routes={routeConfiguration}
+                  isOwnListing={isOwnListing}
+                  onSubmit={handleOrderSubmit}
+                  authorLink={
+                    <NamedLink
+                      className={css.authorNameLink}
+                      name="ListingPage"
+                      params={params}
+                      to={{ hash: '#author' }}
+                    >
+                      {authorDisplayName}
+                    </NamedLink>
+                  }
+                  title={<FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />}
+                  titleDesktop={
+                    <H4 as="h1" className={css.orderPanelTitle}>
+                      <FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />
+                    </H4>
+                  }
+                  payoutDetailsWarning={payoutDetailsWarning}
+                  author={ensuredAuthor}
+                  onManageDisableScrolling={onManageDisableScrolling}
+                  onContactUser={onContactUser}
+                  monthlyTimeSlots={monthlyTimeSlots}
+                  onFetchTimeSlots={onFetchTimeSlots}
+                  onFetchTransactionLineItems={onFetchTransactionLineItems}
+                  lineItems={lineItems}
+                  fetchLineItemsInProgress={fetchLineItemsInProgress}
+                  fetchLineItemsError={fetchLineItemsError}
+                  validListingTypes={config.listing.listingTypes}
+                  marketplaceCurrency={config.currency}
+                  dayCountAvailableForBooking={config.stripe.dayCountAvailableForBooking}
+                  marketplaceName={config.marketplaceName}
+                  setInquiryModalOpen={setCustomInquiryModalOpen}
+                />
+              </div>
+              <Modal
+                id="ListingPage.inquiry"
+                contentClassName={css.inquiryModalContent}
+                isOpen={isAuthenticated && customInquiryModalOpen}
+                onClose={() => setCustomInquiryModalOpen(false)}
+                usePortal
+                onManageDisableScrolling={onManageDisableScrolling}
+              >
+                <CustomInquiryForm
+                  className={css.inquiryForm}
+                  submitButtonWrapperClassName={css.inquirySubmitButtonWrapper}
+                  listingTitle={title}
+                  authorDisplayName={authorDisplayName}
+                  sendInquiryError={sendInquiryError}
+                  onSubmit={handleInquiryFormSubmit}
+                  inProgress={sendInquiryInProgress}
+                  marketplaceCurrency={config.currency}
+                  offerPrice={price}
+                  flex_price={Array.isArray(flex_price) && flex_price.length > 0}
+                  listing={currentListing}
+                />
+              </Modal>
             </div>
+          </div>
 
-            <SectionGallery
-              listing={currentListing}
-              variantPrefix={config.layout.listingImage.variantPrefix}
-            />
+          <SectionGallery
+            listing={currentListing}
+            variantPrefix={config.layout.listingImage.variantPrefix}
+          />
 
-            {/* <SectionReviews reviews={reviews} fetchReviewsError={fetchReviewsError} /> */}
-            {/* <SectionAuthorMaybe
+          {/* <SectionReviews reviews={reviews} fetchReviewsError={fetchReviewsError} /> */}
+          {/* <SectionAuthorMaybe
               title={title}
               listing={currentListing}
               authorDisplayName={authorDisplayName}
@@ -517,95 +655,94 @@ export const ListingPageComponent = props => {
               onManageDisableScrolling={onManageDisableScrolling}
             /> */}
 
-            {offerListingItems &&
-              Array.isArray(offerListingItems) &&
-              offerListingItems.length > 0 ? (
-              <SectionOfferListingsMaybe
-                listings={offerListingItems}
-                intl={intl}
-                onInitializeCardPaymentData={onInitializeCardPaymentData}
-                currentUser={currentUser}
-                callSetInitialValues={callSetInitialValues}
-                getListing={getListing}
-                isOwnListing={isOwnListing}
-              />
-            ) : null}
-          </div>
-          <div className={css.orderColumnForProductLayout}>
-            <OrderPanel
-              className={css.productOrderPanel}
-              listing={currentListing}
+          {offerListingItems &&
+            Array.isArray(offerListingItems) &&
+            offerListingItems.length > 0 ? (
+            <SectionOfferListingsMaybe
+              listings={offerListingItems}
+              intl={intl}
+              onInitializeCardPaymentData={onInitializeCardPaymentData}
               currentUser={currentUser}
-              routes={routeConfiguration}
+              callSetInitialValues={callSetInitialValues}
+              getListing={getListing}
               isOwnListing={isOwnListing}
-              onSubmit={handleOrderSubmit}
-              authorLink={
-                <NamedLink
-                  className={css.authorNameLink}
-                  name="ListingPage"
-                  params={params}
-                  to={{ hash: '#author' }}
-                >
-                  {authorDisplayName}
-                </NamedLink>
-              }
-              title={<FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />}
-              titleDesktop={
-                <H4 as="h1" className={css.orderPanelTitle}>
-                  <FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />
-                </H4>
-              }
-              payoutDetailsWarning={payoutDetailsWarning}
-              author={ensuredAuthor}
-              onManageDisableScrolling={onManageDisableScrolling}
-              onContactUser={onContactUser}
-              monthlyTimeSlots={monthlyTimeSlots}
-              onFetchTimeSlots={onFetchTimeSlots}
-              onFetchTransactionLineItems={onFetchTransactionLineItems}
-              lineItems={lineItems}
-              fetchLineItemsInProgress={fetchLineItemsInProgress}
-              fetchLineItemsError={fetchLineItemsError}
-              validListingTypes={config.listing.listingTypes}
-              marketplaceCurrency={config.currency}
-              dayCountAvailableForBooking={config.stripe.dayCountAvailableForBooking}
-              marketplaceName={config.marketplaceName}
-              setInquiryModalOpen={setCustomInquiryModalOpen}
             />
-            <Share
-              className={css.shareWrapper}
-              title={intl.formatMessage({
-                id: 'ListingPage.ogTitle',
-              }, {
-                title,
-              })}
-              description={intl.formatMessage({
-                id: 'ListingPage.ogDescription',
-              })}
-            />
-          </div>
-          <Modal
-            id="ListingPage.inquiry"
-            contentClassName={css.inquiryModalContent}
-            isOpen={isAuthenticated && customInquiryModalOpen}
-            onClose={() => setCustomInquiryModalOpen(false)}
-            usePortal
-            onManageDisableScrolling={onManageDisableScrolling}
-          >
-            <CustomInquiryForm
-              className={css.inquiryForm}
-              submitButtonWrapperClassName={css.inquirySubmitButtonWrapper}
-              listingTitle={title}
-              authorDisplayName={authorDisplayName}
-              sendInquiryError={sendInquiryError}
-              onSubmit={handleInquiryFormSubmit}
-              inProgress={sendInquiryInProgress}
-              marketplaceCurrency={config.currency}
-              offerPrice={price}
-              flex_price={Array.isArray(flex_price) && flex_price.length > 0}
-              listing={currentListing}
-            />
-          </Modal>
+          ) : null}
         </div>
+        <div className={css.orderColumnForProductLayout}>
+          <OrderPanel
+            className={css.productOrderPanel}
+            listing={currentListing}
+            currentUser={currentUser}
+            routes={routeConfiguration}
+            isOwnListing={isOwnListing}
+            onSubmit={handleOrderSubmit}
+            authorLink={
+              <NamedLink
+                className={css.authorNameLink}
+                name="ListingPage"
+                params={params}
+                to={{ hash: '#author' }}
+              >
+                {authorDisplayName}
+              </NamedLink>
+            }
+            title={<FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />}
+            titleDesktop={
+              <H4 as="h1" className={css.orderPanelTitle}>
+                <FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />
+              </H4>
+            }
+            payoutDetailsWarning={payoutDetailsWarning}
+            author={ensuredAuthor}
+            onManageDisableScrolling={onManageDisableScrolling}
+            onContactUser={onContactUser}
+            monthlyTimeSlots={monthlyTimeSlots}
+            onFetchTimeSlots={onFetchTimeSlots}
+            onFetchTransactionLineItems={onFetchTransactionLineItems}
+            lineItems={lineItems}
+            fetchLineItemsInProgress={fetchLineItemsInProgress}
+            fetchLineItemsError={fetchLineItemsError}
+            validListingTypes={config.listing.listingTypes}
+            marketplaceCurrency={config.currency}
+            dayCountAvailableForBooking={config.stripe.dayCountAvailableForBooking}
+            marketplaceName={config.marketplaceName}
+            setInquiryModalOpen={setCustomInquiryModalOpen}
+          />
+          <Share
+            className={css.shareWrapper}
+            title={intl.formatMessage({
+              id: 'ListingPage.ogTitle',
+            }, {
+              title,
+            })}
+            description={intl.formatMessage({
+              id: 'ListingPage.ogDescription',
+            })}
+          />
+        </div>
+        <Modal
+          id="ListingPage.inquiry"
+          contentClassName={css.inquiryModalContent}
+          isOpen={isAuthenticated && customInquiryModalOpen}
+          onClose={() => setCustomInquiryModalOpen(false)}
+          usePortal
+          onManageDisableScrolling={onManageDisableScrolling}
+        >
+          <CustomInquiryForm
+            className={css.inquiryForm}
+            submitButtonWrapperClassName={css.inquirySubmitButtonWrapper}
+            listingTitle={title}
+            authorDisplayName={authorDisplayName}
+            sendInquiryError={sendInquiryError}
+            onSubmit={handleInquiryFormSubmit}
+            inProgress={sendInquiryInProgress}
+            marketplaceCurrency={config.currency}
+            offerPrice={price}
+            flex_price={Array.isArray(flex_price) && flex_price.length > 0}
+            listing={currentListing}
+          />
+        </Modal>
       </LayoutSingleColumn>
     </Page>
   );
