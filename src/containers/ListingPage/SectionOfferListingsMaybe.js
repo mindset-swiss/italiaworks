@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
-import { AvatarSmall, Form, H4, ReviewRating } from '../../components';
+import { AvatarSmall, Form, H4, ReviewRatingCustom } from '../../components';
 import { useRouteConfiguration } from '../../context/routeConfigurationContext';
 import { formatMoney } from '../../util/currency';
 import { ensureUser } from '../../util/data';
@@ -14,7 +14,7 @@ import css from './ListingPage.module.css';
 import { handleCustomSubmit } from './ListingPage.shared';
 const { Money } = sdkTypes;
 
-const maxLength = 100;
+const maxLength = 288;
 
 const SectionOfferListingsMaybe = props => {
   const {
@@ -53,16 +53,15 @@ const SectionOfferListingsMaybe = props => {
           const formattedPrice = formatMoney(intl, convertPrice);
 
           const listingIsPublishedByUser = currentUser ? author.id.uuid === currentUser.id.uuid : true;
+          const descriptionLength = description.length;
 
-          const displayText = isExpanded ? description : `${description.slice(0, maxLength)}...`;
+          const displayText = isExpanded ? description : (descriptionLength > 288 ? `${description.slice(0, maxLength)}...` : description);
 
           const descriptionWithLinks = richText(displayText, {
-            linkify: true,
-            longWordMinLength: MIN_LENGTH_FOR_LONG_WORDS,
-            longWordClass: css.longWord,
+            // linkify: true,
+            // longWordMinLength: MIN_LENGTH_FOR_LONG_WORDS,
+            // longWordClass: css.longWord,
           });
-
-          const descriptionLength = description.length;
 
           if (!isOwnListing) {
             if (!listingIsPublishedByUser) return null
@@ -116,14 +115,23 @@ const SectionOfferListingsMaybe = props => {
                     <div key={listing.id.uuid} className={css.offerListingContent}>
                       <div className={css.offerListingAvatarContent}>
                         <div className={css.showFlex}>
-                          <AvatarSmall user={ensuredAuthor} />
+                          <AvatarSmall
+                            user={ensuredAuthor}
+                            className={css.providerAvatar}
+                          />
                           <div>
-                            {displayName}
-                            {rating ? <ReviewRating
+                            <div className={css.displayName}>{displayName}</div>
+                            {!!rating && (
+                              <ReviewRatingCustom
+                                rating={5}
+                                reviews={1}
+                              />
+                            )}
+                            {/* {rating ? <ReviewRating
                               reviewStarClassName={css.reviewStar}
                               className={css.reviewStars}
                               rating={rating}
-                            /> : null}
+                            /> : null} */}
                           </div>
                         </div>
                         <div className={css.offerListingAcceptOfferContent}>
@@ -144,10 +152,10 @@ const SectionOfferListingsMaybe = props => {
                       </div>
 
                       <div className={css.offerListingDescriptionContent}>
-                        <p className={css.offerListingBio}>{descriptionWithLinks}</p>
-                        {!isExpanded && descriptionLength >= maxLength && (
-                          <div className={css.expandButton} onClick={() => setIsExpanded(true)}>
-                            Contrai
+                        <p className={`${css.offerListingBio} ${isExpanded ? css.expanded : ''}`}>{descriptionWithLinks}</p>
+                        {descriptionLength >= maxLength && (
+                          <div className={css.expandButton} onClick={() => setIsExpanded(!isExpanded)}>
+                            <FormattedMessage id={isExpanded ? 'ListingPage.SectionOfferListingsMaybe.collapse' : 'ListingPage.SectionOfferListingsMaybe.expand'} />
                           </div>
                         )}
                       </div>

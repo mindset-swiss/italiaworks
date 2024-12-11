@@ -1,10 +1,9 @@
-name: build-and-deploy-sharetribe
-run-name: Build and deploy Sharetribe
+name: deploy-server
+run-name: Deploy server
 on:
   workflow_dispatch:
   push:
     branches:
-      - stage
       - main
     paths:
       - src/**
@@ -13,9 +12,25 @@ on:
       - yarn.lock
       - .github/workflows/build-and-deploy-sharetribe.yaml
       - Dockerfile
+      - docker-compose.yaml
+concurrency: 
+  group: main
+  cancel-in-progress: true
 jobs:
-  build-and-deploy-sharetribe:
-    uses: mindset-swiss/github-workflows/.github/workflows/build-and-deploy-sharetribe.yaml@main
-    with:
-      docker-image-name: italiaworks
-    secrets: inherit
+  deploy-server:
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands using private key
+        uses: appleboy/ssh-action@v1.0.0
+        if: github.ref_name == 'main'
+        with:
+          host: 165.232.117.209
+          username: root
+          key:  ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd /root/italiawork;
+            git stash;
+            git checkout ${{ github.ref_name }};
+            git pull origin ${{ github.ref_name }} --ff-only;
+            docker-compose up -d;
+            echo y | docker system prune -a;

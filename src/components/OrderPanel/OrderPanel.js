@@ -272,7 +272,7 @@ const OrderPanel = props => {
 
   return (
     <div className={classes}>
-      <ModalInMobile
+      {/* <ModalInMobile
         containerClassName={css.modalContainer}
         id="OrderFormInModal"
         isModalOpenOnMobile={isOrderOpen}
@@ -280,7 +280,7 @@ const OrderPanel = props => {
         showAsModalMaxWidth={MODAL_BREAKPOINT}
         onManageDisableScrolling={onManageDisableScrolling}
         usePortal
-      >
+      > */}
         {/* <div className={css.modalHeading}>
           <H1 className={css.heading}>{title}</H1>
         </div>
@@ -380,17 +380,51 @@ const OrderPanel = props => {
         ) : showInquiryForm ? (
           // <InquiryWithoutPaymentForm formId="OrderPanelInquiryForm" onSubmit={onSubmit} />
           <div className={css.customInquiryForm}>
-            <div className={css.customInquiryBudget}>
-              <FormattedMessage id="OrderPanel.customInquiryFormBudget" />
+            <div>
+              <div className={css.customInquiryBudget}>
+                <FormattedMessage id="OrderPanel.customInquiryFormBudget" />
+              </div>
+              <div className={css.customInquiryPrice}>{formattedPrice}</div>
             </div>
-            <div className={css.customInquiryPrice}>{formattedPrice}</div>
 
             <div className={css.customInquiryBudgetFlex}>
-              {flex_price && flex_price.length > 0 ? <><IconCheckmark /> <FormattedMessage id="OrderPanel.customInquiryBudgetFlex" /></> : null}
-
+              {flex_price && flex_price.length > 0 ? (
+                <>
+                  <svg
+                    width="16"
+                    height="16"
+                    viewBox="0 0 16 16"
+                    fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <mask
+                      id="mask0_307_996"
+                      maskUnits="userSpaceOnUse"
+                      x="0"
+                      y="0"
+                      width="16"
+                      height="16"
+                    >
+                      <rect
+                        width="16"
+                        height="16"
+                        fill="#D9D9D9"
+                      />
+                    </mask>
+                    <g mask="url(#mask0_307_996)">
+                      <path
+                        d="M6.36689 10.1L12.0169 4.45C12.1502 4.31667 12.3058 4.25 12.4836 4.25C12.6613 4.25 12.8169 4.31667 12.9502 4.45C13.0836 4.58333 13.1502 4.74167 13.1502 4.925C13.1502 5.10833 13.0836 5.26667 12.9502 5.4L6.83355 11.5333C6.70022 11.6667 6.54466 11.7333 6.36689 11.7333C6.18911 11.7333 6.03355 11.6667 5.90022 11.5333L3.03355 8.66667C2.90022 8.53333 2.83633 8.375 2.84189 8.19167C2.84744 8.00833 2.91689 7.85 3.05022 7.71667C3.18355 7.58333 3.34189 7.51667 3.52522 7.51667C3.70855 7.51667 3.86689 7.58333 4.00022 7.71667L6.36689 10.1Z"
+                        fill="#1C1B1F"
+                      />
+                    </g>
+                  </svg>
+                  <FormattedMessage id="OrderPanel.customInquiryBudgetFlex" /></>
+              ) : null}
             </div>
             {console.log(currentUser)}
-            <FormattedMessage id="OrderPanel.customInquiryFormPriceDescription" />
+            <div className={css.description}>
+              <FormattedMessage id="OrderPanel.customInquiryFormPriceDescription" />
+            </div>
             <PrimaryButton
               onClick={() => {
                 if (!isOwnListing) {
@@ -414,8 +448,8 @@ const OrderPanel = props => {
             <FormattedMessage id="OrderPanel.unknownTransactionProcess" />
           </p>
         ) : null}
-      </ModalInMobile>
-      <div className={css.openOrderForm}>
+      {/* </ModalInMobile> */}
+      {/* <div className={css.openOrderForm}>
         <PriceMaybe
           price={price}
           publicData={publicData}
@@ -463,7 +497,7 @@ const OrderPanel = props => {
             )}
           </PrimaryButton>
         )}
-      </div>
+      </div> */}
     </div>
   );
 };
