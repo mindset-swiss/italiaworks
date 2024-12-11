@@ -117,6 +117,8 @@ const tabLabelAndSubmit = (intl, tab, isNewListingFlow, isPriceDisabled, process
   const processNameString = isNewListingFlow ? `${processName}.` : '';
   const newOrEdit = isNewListingFlow ? 'new' : 'edit';
 
+  console.log(tab);
+
   let labelKey = null;
   let submitButtonKey = null;
   if (tab === DETAILS) {
@@ -124,7 +126,7 @@ const tabLabelAndSubmit = (intl, tab, isNewListingFlow, isPriceDisabled, process
     submitButtonKey = `EditListingWizard.${processNameString}${newOrEdit}.saveDetails`;
   } else if (tab === PRICING) {
     labelKey = 'EditListingWizard.tabLabelPricing';
-    submitButtonKey = `EditListingWizard.${processNameString}${newOrEdit}.savePricing`;
+    submitButtonKey = `EditListingWizard.${processNameString}${newOrEdit}.savePricingPublish`;
   } else if (tab === PRICING_AND_STOCK) {
     labelKey = 'EditListingWizard.tabLabelPricingAndStock';
     submitButtonKey = `EditListingWizard.${processNameString}${newOrEdit}.savePricingAndStock`;
@@ -142,7 +144,7 @@ const tabLabelAndSubmit = (intl, tab, isNewListingFlow, isPriceDisabled, process
     submitButtonKey = `EditListingWizard.${processNameString}${newOrEdit}.saveAvailability`;
   } else if (tab === PHOTOS) {
     labelKey = 'EditListingWizard.tabLabelPhotos';
-    submitButtonKey = `EditListingWizard.${processNameString}${newOrEdit}.savePhotos`;
+    submitButtonKey = `EditListingWizard.${processNameString}${newOrEdit}.savePhotosAvanti`;
   }
 
   return {
