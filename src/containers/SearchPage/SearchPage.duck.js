@@ -310,7 +310,7 @@ export const loadData = (params, search, config) => (dispatch, getState, sdk) =>
       ...originMaybe,
       page,
       perPage: RESULT_PAGE_SIZE,
-      include: ['author', 'images'],
+      include: ['author', 'images', 'author.profileImage'],
       'fields.listing': [
         'title',
         'geolocation',
@@ -320,6 +320,10 @@ export const loadData = (params, search, config) => (dispatch, getState, sdk) =>
         'publicData.listingType',
         'publicData.transactionProcessAlias',
         'publicData.unitType',
+        'publicData.location',
+        'publicData.project_type',
+        'publicData.selectedDate',
+        'publicData.selectedOption',
         // These help rendering of 'purchase' listings,
         // when transitioning from search page to listing page
         'publicData.pickupEnabled',
@@ -329,10 +333,25 @@ export const loadData = (params, search, config) => (dispatch, getState, sdk) =>
       ],
       'fields.user': ['profile.displayName', 'profile.abbreviatedName'],
       'fields.image': [
+        // Scaled variants for large images
         'variants.scaled-small',
         'variants.scaled-medium',
+        'variants.scaled-large',
+        'variants.scaled-xlarge',
+  
+        // Cropped variants for listing thumbnail images
         `variants.${variantPrefix}`,
         `variants.${variantPrefix}-2x`,
+        `variants.${variantPrefix}-4x`,
+        `variants.${variantPrefix}-6x`,
+  
+        // Social media
+        'variants.facebook',
+        'variants.twitter',
+  
+        // Avatars
+        'variants.square-small',
+        'variants.square-small2x',
       ],
       ...createImageVariantConfig(`${variantPrefix}`, 400, aspectRatio),
       ...createImageVariantConfig(`${variantPrefix}-2x`, 800, aspectRatio),

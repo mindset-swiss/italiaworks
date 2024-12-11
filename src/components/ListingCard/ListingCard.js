@@ -1,6 +1,7 @@
 import React from 'react';
 import { string, func, bool, oneOfType } from 'prop-types';
 import classNames from 'classnames';
+import moment from 'moment';
 
 import { useConfiguration } from '../../context/configurationContext';
 
@@ -14,7 +15,10 @@ import { richText } from '../../util/richText';
 import { createSlug } from '../../util/urlHelpers';
 import { isBookingProcessAlias } from '../../transactions/transaction';
 
-import { AspectRatioWrapper, NamedLink, ResponsiveImage } from '../../components';
+import { AspectRatioWrapper, AvatarMedium, NamedLink, ResponsiveImage } from '../../components';
+import ListingCardAddress from './ListingCardAddress';
+import ListingCardDate from './ListingCardDate';
+import ListingCardOffers from './ListingCardOffers';
 
 import css from './ListingCard.module.css';
 
@@ -88,6 +92,10 @@ export const ListingCardComponent = props => {
   const firstImage =
     currentListing.images && currentListing.images.length > 0 ? currentListing.images[0] : null;
 
+  const capitalizeFirstLetter = val => {
+    return `${String(val).charAt(0).toUpperCase()}${String(val).slice(1)}`;
+  }
+
   const {
     aspectWidth = 1,
     aspectHeight = 1,
@@ -99,14 +107,36 @@ export const ListingCardComponent = props => {
 
   const setActivePropsMaybe = setActiveListing
     ? {
-        onMouseEnter: () => setActiveListing(currentListing.id),
-        onMouseLeave: () => setActiveListing(null),
-      }
+      onMouseEnter: () => setActiveListing(currentListing.id),
+      onMouseLeave: () => setActiveListing(null),
+    }
     : null;
+
+  let address = '';
+
+  if (currentListing?.attributes?.publicData?.location?.address) {
+    address = currentListing.attributes.publicData.location.address;
+  } else if (currentListing?.attributes?.publicData?.project_type && currentListing.attributes.publicData.project_type === 'online') {
+    address = <FormattedMessage id="ListingPage.online" />;
+  }
+
+  let selectedDate = '';
+
+  if (currentListing?.attributes?.publicData?.selectedDate || currentListing?.attributes?.publicData?.selectedOption) {
+    if (currentListing?.attributes?.publicData?.selectedOption === 'Sono flessibile') {
+      selectedDate = currentListing.attributes.publicData.selectedOption;
+    } else {
+      selectedDate = `${currentListing?.attributes?.publicData?.selectedOption ? `${currentListing.attributes.publicData.selectedOption}: ` : ''}${currentListing?.attributes?.publicData?.selectedDate ? capitalizeFirstLetter(moment(currentListing.attributes.publicData.selectedDate).format('dddd D MMMM, YYYY')) : ''}`;
+    }
+  }
+  
+  const ensuredAuthor = ensureUser(currentListing.author);
+
+  console.log(currentListing);
 
   return (
     <NamedLink className={classes} name="ListingPage" params={{ id, slug }}>
-      <AspectRatioWrapper
+      {/* <AspectRatioWrapper
         className={css.aspectRatioWrapper}
         width={aspectWidth}
         height={aspectHeight}
@@ -119,9 +149,8 @@ export const ListingCardComponent = props => {
           variants={variants}
           sizes={renderSizes}
         />
-      </AspectRatioWrapper>
-      <div className={css.info}>
-        <PriceMaybe price={price} publicData={publicData} config={config} intl={intl} />
+      </AspectRatioWrapper> */}
+      <div className={css.card}>
         <div className={css.mainInfo}>
           <div className={css.title}>
             {richText(title, {
@@ -129,11 +158,18 @@ export const ListingCardComponent = props => {
               longWordClass: css.longWord,
             })}
           </div>
-          {showAuthorInfo ? (
-            <div className={css.authorInfo}>
-              <FormattedMessage id="ListingCard.author" values={{ authorName }} />
-            </div>
-          ) : null}
+          <div className={css.meta}>
+            {!!address && <ListingCardAddress text={address} />}
+            {!!selectedDate && <ListingCardDate text={selectedDate} />}
+            {/* TODO: get offers count */}
+            {/* <ListingCardOffers /> */}
+          </div>
+          {/* TODO: listing status In cerca/Assegnato */}
+          {/* <div className={css.status}>In cerca</div> */}
+        </div>
+        <div className={css.aside}>
+          <PriceMaybe price={price} publicData={publicData} config={config} intl={intl} />
+          <AvatarMedium user={ensuredAuthor} disableProfileLink={true} className={css.avatar} />
         </div>
       </div>
     </NamedLink>

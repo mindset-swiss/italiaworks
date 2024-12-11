@@ -67,6 +67,7 @@
 .initialsMedium {
   composes: textLarge from global;
   padding: 0;
+  text-transform: uppercase;
 }
 
 /* Large Avatar */
