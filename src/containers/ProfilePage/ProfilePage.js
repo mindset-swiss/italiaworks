@@ -140,7 +140,7 @@ export const DesktopReviews = props => {
   const desktopReviewTabs = [
     {
       text: (
-        <Heading as="h3" rootClassName={css.desktopReviewsTitle}>
+        <Heading as="h4" rootClassName={css.desktopReviewsTitle}>
           <FormattedMessage
             id="ProfilePage.reviewsFromMyCustomersTitle"
             values={{ count: reviewsOfProvider.length }}
@@ -152,7 +152,7 @@ export const DesktopReviews = props => {
     },
     {
       text: (
-        <Heading as="h3" rootClassName={css.desktopReviewsTitle}>
+        <Heading as="h4" rootClassName={css.desktopReviewsTitle}>
           <FormattedMessage
             id="ProfilePage.reviewsAsACustomerTitle"
             values={{ count: reviewsOfCustomer.length }}

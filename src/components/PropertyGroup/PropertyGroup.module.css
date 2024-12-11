@@ -51,7 +51,7 @@
 }
 
 .selectedLabel {
-  font-weight: var(--fontWeightSemiBold);
+  font-weight: var(--fontWeightMedium);
 }
 
 .notSelectedLabel {

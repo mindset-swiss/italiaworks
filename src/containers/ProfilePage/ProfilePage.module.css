@@ -180,6 +180,7 @@
 
 .mobileReviewsTitle {
   margin: 24px 0 26px 0;
+  font-size: medium;
 }
 
 .mobileReviews {
@@ -207,6 +208,7 @@
 .desktopReviewsTitle {
   composes: textLarge from global;
   margin-bottom: 0;
+  font-size: large;
 }
 
 .desktopReviewsTabNav {
