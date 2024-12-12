@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Form as FinalForm } from 'react-final-form';
 import { FormattedMessage } from 'react-intl';
 import { useHistory } from 'react-router-dom/cjs/react-router-dom.min';
-import { AvatarSmall, Form, H4, ReviewRatingCustom } from '../../components';
+import { AvatarSmall, Form, H4, NamedLink, ReviewRatingCustom } from '../../components';
 import { useRouteConfiguration } from '../../context/routeConfigurationContext';
 import { formatMoney } from '../../util/currency';
 import { ensureUser } from '../../util/data';
@@ -46,9 +46,6 @@ const SectionOfferListingsMaybe = props => {
           const [isExpanded, setIsExpanded] = useState(false);
           const { attributes, author, id, reviews } = listing || {};
           const { description, price, title } = attributes || {};
-
-          console.log(reviews);
-          
           const rating = reviews.map(review => review.attributes.rating).reduce((a, b) => a + b, 0) / reviews.length
           const ensuredAuthor = ensureUser(author);
           const { displayName } = ensuredAuthor?.attributes?.profile || {};
@@ -110,7 +107,12 @@ const SectionOfferListingsMaybe = props => {
                 } = fieldRenderProps;
                 const classes = classNames(rootClassName || css.root, className);
 
-                console.log(reviews);
+                const linkProps = {
+                  name: 'ProfilePage',
+                  params: {
+                    id: author.id.uuid,
+                  }
+                }
 
                 return (
                   <Form
@@ -120,10 +122,11 @@ const SectionOfferListingsMaybe = props => {
                   >
                     <div key={listing.id.uuid} className={css.offerListingContent}>
                       <div className={css.offerListingAvatarContent}>
-                        <div className={css.showFlex}>
+                        <NamedLink {...linkProps} className={css.showFlex}>
                           <AvatarSmall
                             user={ensuredAuthor}
                             className={css.providerAvatar}
+                            disableProfileLink={true}
                           />
                           <div>
                             <div className={css.displayName}>{displayName}</div>
@@ -139,7 +142,7 @@ const SectionOfferListingsMaybe = props => {
                               rating={rating}
                             /> : null} */}
                           </div>
-                        </div>
+                        </NamedLink>
                         <div className={css.offerListingAcceptOfferContent}>
                           {!listingIsPublishedByUser && (
                             <div
