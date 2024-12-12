@@ -81,7 +81,7 @@
   border-radius: 4px;
 
   @media (--viewportMedium) {
-    max-width: calc(100% - 237px);
+    max-width: calc(100% - 327px);
   }
 }
 
@@ -241,7 +241,7 @@
   background: #ffffff;
   
   @media (--viewportMedium) {
-    width: calc(100% - 237px);
+    width: calc(100% - 327px);
     border-radius: 4px;
     padding: 24px;
   }
@@ -249,7 +249,7 @@
 
 .orderColumnForProductLayout {
   @media (--viewportMedium) {
-    width: 210px;
+    width: 300px;
   }
   @media (--viewportLarge) {
   }

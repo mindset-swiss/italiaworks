@@ -320,11 +320,11 @@ export const ListingPageComponent = props => {
   const schemaAvailability = !currentListing.currentStock
     ? null
     : currentStock > 0
-    ? 'https://schema.org/InStock'
-    : 'https://schema.org/OutOfStock';
+      ? 'https://schema.org/InStock'
+      : 'https://schema.org/OutOfStock';
 
   const availabilityMaybe = schemaAvailability ? { availability: schemaAvailability } : {};
-  const orderData = {deliveryMethod: 'none'};
+  const orderData = { deliveryMethod: 'none' };
   const transaction = null;
   const initialData = { orderData, listing: currentListing, transaction };
   const pageData = handlePageData(initialData, STORAGE_KEY, history);
@@ -433,29 +433,24 @@ export const ListingPageComponent = props => {
                 </div>
                 {/* <SectionTextMaybe text={description} showAsIngress /> */}
 
-                <div className={css.author}>
-                  <AvatarMedium user={ensuredAuthor} className={css.providerAvatar} />
-                  <span className={css.providerNameLinked}>
-                    <FormattedMessage
-                      id="OrderPanel.author"
-                      values={{
-                        name: (
-                          <NamedLink
-                            className={css.authorNameLink}
-                            name="ListingPage"
-                            params={params}
-                            to={{ hash: '#author' }}
-                          >
-                            {authorDisplayName}
-                          </NamedLink>
-                        ),
-                      }}
-                    />
-                  </span>
-                  {/* <span className={css.providerNamePlain}>
-                    <FormattedMessage id="OrderPanel.author" values={{ name: authorDisplayName }} />
-                  </span> */}
-                </div>
+                <NamedLink
+                  className={css.authorNameLink}
+                  name="ListingPage"
+                  params={params}
+                  to={{ hash: '#author' }}
+                >
+                  <div className={css.author}>
+                    <AvatarMedium user={ensuredAuthor} className={css.providerAvatar} />
+                    <span className={css.providerNameLinked}>
+                      <FormattedMessage
+                        id="OrderPanel.author"
+                        values={{
+                          name: authorDisplayName
+                        }}
+                      />
+                    </span>
+                  </div>
+                </NamedLink>
 
                 {/* <CustomListingFields
                   publicData={publicData}
@@ -569,19 +564,15 @@ export const ListingPageComponent = props => {
                   onManageDisableScrolling={onManageDisableScrolling}
                 /> */}
 
-                {offerListingItems &&
-                  Array.isArray(offerListingItems) &&
-                  offerListingItems.length > 0 ? (
-                  <SectionOfferListingsMaybe
-                    listings={offerListingItems}
-                    intl={intl}
-                    onInitializeCardPaymentData={onInitializeCardPaymentData}
-                    currentUser={currentUser}
-                    callSetInitialValues={callSetInitialValues}
-                    getListing={getListing}
-                    isOwnListing={isOwnListing}
-                  />
-                ) : null}
+                <SectionOfferListingsMaybe
+                  listings={offerListingItems}
+                  intl={intl}
+                  onInitializeCardPaymentData={onInitializeCardPaymentData}
+                  currentUser={currentUser}
+                  callSetInitialValues={callSetInitialValues}
+                  getListing={getListing}
+                  isOwnListing={isOwnListing}
+                />
               </div>
               <div className={css.orderColumnForProductLayout}>
                 <OrderPanel
@@ -649,11 +640,6 @@ export const ListingPageComponent = props => {
             </div>
           </div>
 
-          <SectionGallery
-            listing={currentListing}
-            variantPrefix={config.layout.listingImage.variantPrefix}
-          />
-
           {/* <SectionReviews reviews={reviews} fetchReviewsError={fetchReviewsError} /> */}
           {/* <SectionAuthorMaybe
               title={title}
@@ -691,8 +677,8 @@ export const ListingPageComponent = props => {
             listing={currentListing}
           />
         </Modal>
-      </LayoutSingleColumn>
-    </Page>
+      </LayoutSingleColumn >
+    </Page >
   );
 };
 

@@ -37,7 +37,7 @@ const SectionOfferListingsMaybe = props => {
         <FormattedMessage
           id="ListingPage.SectionOfferListingsMaybe.title"
           values={{
-            value: <span style={{ fontWeight: 'bold' }}>{listings.length}</span>,
+            value: <span style={{ fontWeight: 'bold' }}>{listings?.length ? listings.length : 0}</span>,
           }}
         />
       </H4>
@@ -46,6 +46,9 @@ const SectionOfferListingsMaybe = props => {
           const [isExpanded, setIsExpanded] = useState(false);
           const { attributes, author, id, reviews } = listing || {};
           const { description, price, title } = attributes || {};
+
+          console.log(reviews);
+          
           const rating = reviews.map(review => review.attributes.rating).reduce((a, b) => a + b, 0) / reviews.length
           const ensuredAuthor = ensureUser(author);
           const { displayName } = ensuredAuthor?.attributes?.profile || {};
@@ -106,6 +109,9 @@ const SectionOfferListingsMaybe = props => {
                   values,
                 } = fieldRenderProps;
                 const classes = classNames(rootClassName || css.root, className);
+
+                console.log(reviews);
+
                 return (
                   <Form
                     className={classes}
@@ -123,8 +129,8 @@ const SectionOfferListingsMaybe = props => {
                             <div className={css.displayName}>{displayName}</div>
                             {!!rating && (
                               <ReviewRatingCustom
-                                rating={5}
-                                reviews={1}
+                                rating={rating}
+                                reviews={reviews.length}
                               />
                             )}
                             {/* {rating ? <ReviewRating
