@@ -19,6 +19,9 @@ const LinkedLogo = props => {
   } = props;
   const classes = classNames(rootClassName || css.root, className);
   // Note: href might come as an empty string (falsy), in which case we default to 'LandingPage'.
+
+  linkToExternalSite.href = 'https://italiawork.it?ref=web';
+
   return linkToExternalSite?.href ? (
     <ExternalLink className={classes} href={linkToExternalSite.href} target="_self" {...rest}>
       <Logo
