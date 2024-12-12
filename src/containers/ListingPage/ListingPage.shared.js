@@ -467,3 +467,47 @@ export const handleCustomSubmit = parameters => values => {
     )
   );
 };
+
+export const handleToggleFavorites = parameters => isFavorite => {
+  const { currentUser, routes, location, history } = parameters;
+  
+  if (!currentUser) {
+    const state = {
+      from: `${location.pathname}${location.search}${location.hash}`,
+    };
+
+    history.push(createResourceLocatorString('SignupPage', routes, {}, {}), state);
+  } else {
+    const { params, onUpdateFavorites } = parameters;
+
+    const {
+      attributes: { profile },
+    } = currentUser;
+
+    const { favorites = [] } = profile.privateData || {};
+
+    let payload;
+
+    if (!profile.privateData || !profile.privateData?.favorites) {
+      payload = {
+        privateData: {
+          favorites: [params.id],
+        },
+      };
+    } else if (isFavorite) {
+      payload = {
+        privateData: {
+          favorites: favorites.filter(f => f !== params.id),
+        },
+      };
+    } else {
+      payload = {
+        privateData: {
+          favorites: [...favorites, params.id],
+        },
+      };
+    }
+    
+    onUpdateFavorites(payload);
+  }
+};

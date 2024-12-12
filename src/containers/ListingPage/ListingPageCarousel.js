@@ -81,7 +81,9 @@ import {
   LoadingPage,
   priceData,
   priceForSchemaMaybe,
+  handleToggleFavorites,
 } from './ListingPage.shared';
+import { updateProfile } from '../ProfileSettingsPage/ProfileSettingsPage.duck';
 import SectionMapMaybe from './SectionMapMaybe';
 import SectionTextMaybe from './SectionTextMaybe';
 
@@ -98,7 +100,6 @@ import { MIN_LENGTH_FOR_LONG_WORDS } from '../ProfilePage/ProfilePage.js';
 import SectionGallery from './SectionGallery.js';
 import SectionOfferListingsMaybe from './SectionOfferListingsMaybe.js';
 import { pushDataLayerEvent } from '../../analytics/analytics.js';
-import Share from '../../components/Share/Share.js';
 
 const MIN_LENGTH_FOR_LONG_WORDS_IN_TITLE = 16;
 
@@ -142,6 +143,7 @@ export const ListingPageComponent = props => {
     onInquiryWithoutPayment,
     onCreateSellerListing,
     offerListingItems,
+    onUpdateFavorites,
   } = props;
 
   useEffect(() => {
@@ -357,6 +359,67 @@ export const ListingPageComponent = props => {
     },
   };
 
+  const onToggleFavorites = handleToggleFavorites({
+    ...commonParams,
+    currentUser,
+    onUpdateFavorites,
+    location,
+  });
+
+  const isFavorite = currentUser?.attributes.profile.privateData.favorites?.includes(
+    currentListing.id.uuid
+  );
+
+  const toggleFavorites = () => {
+    console.log('toggle');
+
+    onToggleFavorites(isFavorite);
+  }
+
+  const favoriteButton = (
+    <div
+      className={css.toggleFavorites}
+      onClick={toggleFavorites}
+    >
+      {isFavorite ? (
+        <>
+          <svg
+            width="15"
+            height="14"
+            viewBox="0 0 15 14"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M8.51191 12.9998C7.94213 13.4981 7.06498 13.4981 6.49519 12.9925L6.41274 12.9203C2.47672 9.48968 -0.0947834 7.2435 0.00267716 4.44123C0.0476633 3.21342 0.699937 2.03616 1.75703 1.34281C3.73625 0.0427733 6.18032 0.649451 7.49981 2.13729C8.8193 0.649451 11.2633 0.0355599 13.2426 1.34281C14.2997 2.03616 14.9519 3.21342 14.9969 4.44123C15.1019 7.2435 12.5229 9.48968 8.58688 12.9347L8.51191 12.9998Z"
+              fill="#FF4401"
+            />
+          </svg>
+          <FormattedMessage id="ListingPage.unfavoriteButton" />
+        </>
+      ) : (
+        <>
+          <svg
+            width="15"
+            height="14"
+            viewBox="0 0 15 14"
+            fill="none" xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M13.2297 1.24474C11.2524 -0.053991 8.81083 0.552077 7.49266 2.03842C6.17449 0.552077 3.73288 -0.0611971 1.75565 1.24474C0.707095 1.93739 0.0480261 3.10627 0.00308468 4.34005C-0.101758 7.13957 2.47465 9.38354 6.40668 12.8252L6.48157 12.8901C7.05076 13.3879 7.92705 13.388 8.49627 12.8829L8.57864 12.8107C12.5107 9.37628 15.0796 7.13236 14.9822 4.33284C14.9373 3.10627 14.2782 1.93739 13.2297 1.24474ZM7.56755 11.7501L7.49266 11.8222L7.41777 11.7501C3.85271 8.64033 1.50099 6.584 1.50099 4.49879C1.50099 3.05577 2.62443 1.97348 4.12236 1.97348C5.27576 1.97348 6.39917 2.68782 6.79613 3.67628H8.19667C8.58615 2.68782 9.70956 1.97348 10.863 1.97348C12.3609 1.97348 13.4843 3.05577 13.4843 4.49879C13.4843 6.584 11.1326 8.64033 7.56755 11.7501Z"
+              fill="#536471"
+            />
+            <path
+              d="M8.11344 1.7L7.49857 2.31636L6.88071 1.6985C6.1248 0.94269 5.09961 0.518123 4.03067 0.518193C2.96173 0.518263 1.9366 0.942966 1.18079 1.69887C0.424986 2.45478 0.000417979 3.47996 0.00048829 4.54891C0.000558601 5.61785 0.425261 6.64298 1.18117 7.39879L7.10116 13.3188C7.20661 13.4241 7.34954 13.4832 7.49857 13.4832C7.64761 13.4832 7.79054 13.4241 7.89599 13.3188L13.8212 7.39729C14.5762 6.64132 15.0003 5.61654 15.0001 4.54811C15 3.47969 14.5757 2.45502 13.8205 1.69925C13.4458 1.32436 13.001 1.02696 12.5114 0.824061C12.0218 0.621159 11.497 0.516724 10.967 0.516724C10.437 0.516724 9.91216 0.621159 9.42254 0.824061C8.93292 1.02696 8.48808 1.32436 8.11344 1.69925V1.7ZM13.0234 6.60395L7.49857 12.1265L1.976 6.60395C1.70383 6.33467 1.48756 6.01424 1.33963 5.6611C1.1917 5.30796 1.11503 4.92906 1.11401 4.54619C1.11299 4.16332 1.18765 3.78402 1.3337 3.43009C1.47975 3.07617 1.69431 2.7546 1.96504 2.48387C2.23577 2.21313 2.55734 1.99858 2.91126 1.85253C3.26519 1.70648 3.64449 1.63182 4.02736 1.63284C4.41023 1.63386 4.78913 1.71053 5.14227 1.85846C5.49541 2.00639 5.81584 2.22266 6.08512 2.49483L7.10341 3.51236C7.15639 3.5654 7.21944 3.60731 7.28885 3.63564C7.35826 3.66396 7.43263 3.67811 7.50759 3.67728C7.58255 3.67644 7.65659 3.66062 7.72535 3.63075C7.79411 3.60089 7.85621 3.55757 7.90799 3.50336L8.90828 2.49483C9.45964 1.98162 10.1886 1.70225 10.9417 1.71551C11.6948 1.72876 12.4135 2.03359 12.9464 2.56588C13.4794 3.09817 13.7852 3.81642 13.7994 4.56954C13.8136 5.32266 13.5352 6.05193 13.0227 6.60395H13.0234Z"
+              fill="#536471"
+            />
+          </svg>
+          <FormattedMessage id="ListingPage.favoriteButton" />
+        </>
+      )}
+    </div>
+  );
+
   return (
     <Page
       title={schemaTitle}
@@ -431,6 +494,7 @@ export const ListingPageComponent = props => {
                     <FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />
                   </H4>
                 </div> */}
+                {favoriteButton}
                 <SectionTextMaybe text={title} showAsIngress />
                 <div className={css.date}>
                   <span className={css.dateLabel}>
@@ -889,6 +953,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch(initiateInquiryWithoutPayment(params, processAlias, transitionName)),
   onCreateSellerListing: (createParams, queryParams) =>
     dispatch(createSellerListing(createParams, queryParams)),
+  onUpdateFavorites: (payload) => dispatch(updateProfile(payload)),
 });
 
 // Note: it is important that the withRouter HOC is **outside** the

@@ -984,3 +984,10 @@
   padding-left: 32px;
   padding-right: 32px;
 }
+
+.toggleFavorites {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  cursor: pointer;
+}
