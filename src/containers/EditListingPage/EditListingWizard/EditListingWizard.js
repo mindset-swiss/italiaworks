@@ -60,6 +60,7 @@ import EditListingWizardTab, {
   PHOTOS,
   PRICING,
   PRICING_AND_STOCK,
+  DESCRIPTION,
 } from './EditListingWizardTab';
 
 // You can reorder these panels.
@@ -71,7 +72,7 @@ import EditListingWizardTab, {
 const TABS_DETAILS_ONLY = [DETAILS];
 const TABS_PRODUCT = [DETAILS, PRICING_AND_STOCK, DELIVERY, PHOTOS];
 const TABS_BOOKING = [DETAILS, LOCATION, PRICING, AVAILABILITY, PHOTOS];
-const TABS_INQUIRY = [DETAILS, LOCATION, PHOTOS, PRICING];
+const TABS_INQUIRY = [DETAILS, LOCATION, DESCRIPTION, PHOTOS, PRICING];
 const TABS_ALL = [...TABS_PRODUCT, ...TABS_BOOKING, ...TABS_INQUIRY];
 
 // Tabs are horizontal in small screens
@@ -143,8 +144,11 @@ const tabLabelAndSubmit = (intl, tab, isNewListingFlow, isPriceDisabled, process
     labelKey = 'EditListingWizard.tabLabelAvailability';
     submitButtonKey = `EditListingWizard.${processNameString}${newOrEdit}.saveAvailability`;
   } else if (tab === PHOTOS) {
-    labelKey = 'EditListingWizard.tabLabelPhotos';
+    labelKey = 'EditListingWizard.tabLabelPhotosOptional';
     submitButtonKey = `EditListingWizard.${processNameString}${newOrEdit}.savePhotosAvanti`;
+  } else if (tab === DESCRIPTION) {
+    labelKey = 'EditListingWizard.tabLabelDescription';
+    submitButtonKey = `EditListingWizard.${processNameString}${newOrEdit}.saveDescription`;
   }
 
   return {
@@ -251,7 +255,10 @@ const tabCompleted = (tab, listing, config) => {
     case AVAILABILITY:
       return !!availabilityPlan;
     case PHOTOS:
-      // return  images && images.length > 0;
+      // return images && images.length > 0;
+      return !!description;
+      // return true;
+    case DESCRIPTION:
       return !!description;
     default:
       return false;

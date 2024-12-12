@@ -191,7 +191,7 @@ export const EditListingPhotosFormComponent = props => {
               handleSubmit(e);
             }}
           >
-            {showDescription ? (
+            {/* {showDescription ? (
               <FieldTextInput
                 id={`${formId}description`}
                 name="description"
@@ -207,7 +207,7 @@ export const EditListingPhotosFormComponent = props => {
                   })
                 )}
               />
-            ) : null}
+            ) : null} */}
             {updateListingError ? (
               <p className={css.error}>
                 <FormattedMessage id="EditListingPhotosForm.updateFailed" />

@@ -829,7 +829,7 @@ describe('EditListingPage', () => {
 
     await waitFor(() => {
       // Navigation to tab
-      const tabLabel = 'EditListingWizard.tabLabelPhotos';
+      const tabLabel = 'EditListingWizard.tabLabelPhotosOptional';
       expect(getByText(tabLabel)).toBeInTheDocument();
 
       // Tab: panel title
@@ -1932,7 +1932,7 @@ describe('EditListingPage', () => {
 
     await waitFor(() => {
       // Navigation to tab
-      const tabLabel = 'EditListingWizard.tabLabelPhotos';
+      const tabLabel = 'EditListingWizard.tabLabelPhotosOptional';
       expect(getByText(tabLabel)).toBeInTheDocument();
 
       // Tab: panel title
@@ -2325,7 +2325,7 @@ describe('EditListingPage', () => {
 
     await waitFor(() => {
       // Navigation to tab
-      const tabLabel = 'EditListingWizard.tabLabelPhotos';
+      const tabLabel = 'EditListingWizard.tabLabelPhotosOptional';
       expect(getByText(tabLabel)).toBeInTheDocument();
 
       // Tab: panel title

@@ -19,6 +19,7 @@ import EditListingLocationPanel from './EditListingLocationPanel/EditListingLoca
 import EditListingPhotosPanel from './EditListingPhotosPanel/EditListingPhotosPanel';
 import EditListingPricingAndStockPanel from './EditListingPricingAndStockPanel/EditListingPricingAndStockPanel';
 import EditListingPricingPanel from './EditListingPricingPanel/EditListingPricingPanel';
+import EditListingDescriptionPanel from './EditListingDescriptionPanel/EditListingDescriptionPanel';
 
 import css from './EditListingWizardTab.module.css';
 
@@ -29,6 +30,7 @@ export const DELIVERY = 'delivery';
 export const LOCATION = 'location';
 export const AVAILABILITY = 'availability';
 export const PHOTOS = 'photos';
+export const DESCRIPTION = 'description';
 
 // EditListingWizardTab component supports these tabs
 export const SUPPORTED_TABS = [
@@ -39,6 +41,7 @@ export const SUPPORTED_TABS = [
   LOCATION,
   AVAILABILITY,
   PHOTOS,
+  DESCRIPTION,
 ];
 
 const pathParamsToNextTab = (params, tab, marketplaceTabs) => {
@@ -251,6 +254,13 @@ const EditListingWizardTab = props => {
           config ={config}
         />
       );
+    }
+    case DESCRIPTION: {
+      return (
+        <EditListingDescriptionPanel
+          {...panelProps(DESCRIPTION)}
+        />
+      )
     }
     default:
       return null;
