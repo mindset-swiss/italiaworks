@@ -350,6 +350,13 @@ export const ListingPageComponent = props => {
 
   const publishDate = moment(currentListing.attributes.createdAt).format('dddd D MMMM, YYYY');
 
+  const linkProps = {
+    name: 'ProfilePage',
+    params: {
+      id: ensuredAuthor.id.uuid
+    },
+  };
+
   return (
     <Page
       title={schemaTitle}
@@ -435,12 +442,14 @@ export const ListingPageComponent = props => {
 
                 <NamedLink
                   className={css.authorNameLink}
-                  name="ListingPage"
-                  params={params}
-                  to={{ hash: '#author' }}
+                  {...linkProps}
                 >
                   <div className={css.author}>
-                    <AvatarMedium user={ensuredAuthor} className={css.providerAvatar} />
+                    <AvatarMedium
+                      user={ensuredAuthor}
+                      className={css.providerAvatar}
+                      disableProfileLink={true}
+                    />
                     <span className={css.providerNameLinked}>
                       <FormattedMessage
                         id="OrderPanel.author"
