@@ -113,11 +113,13 @@ export const ListingCardComponent = props => {
     : null;
 
   let address = '';
+  let isOnline = false;
 
   if (currentListing?.attributes?.publicData?.location?.address) {
     address = currentListing.attributes.publicData.location.address;
   } else if (currentListing?.attributes?.publicData?.project_type && currentListing.attributes.publicData.project_type === 'online') {
     address = <FormattedMessage id="ListingPage.online" />;
+    isOnline = true;
   }
 
   let selectedDate = '';
@@ -159,7 +161,12 @@ export const ListingCardComponent = props => {
             })}
           </div>
           <div className={css.meta}>
-            {!!address && <ListingCardAddress text={address} />}
+            {!!address && (
+              <ListingCardAddress
+                text={address}
+                isOnline={isOnline}
+              />
+            )}
             {!!selectedDate && <ListingCardDate text={selectedDate} />}
             {/* TODO: get offers count */}
             {/* <ListingCardOffers /> */}

@@ -1,6 +1,9 @@
 import css from "./ListingCard.module.css";
 
-const ListingCardAddress = ({ text }) => {
+const ListingCardAddress = ({ text, isOnline }) => {
+  console.log(text);
+  console.log(isOnline);
+
   return (
     <div className={css.metaItem}>
       <svg
@@ -31,7 +34,7 @@ const ListingCardAddress = ({ text }) => {
           />
         </g>
       </svg>
-      <div>{text}</div>
+      <div>{isOnline ? text : text.replace(/, Italia$/, '')}</div>
     </div>
   );
 }

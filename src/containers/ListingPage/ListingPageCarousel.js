@@ -469,7 +469,7 @@ export const ListingPageComponent = props => {
                       <div className={css.projectTypeTopic}>
                         <FormattedMessage id="ListingPage.ListingPageCarousel.working" />
                       </div>
-                      <div className={css.projectTypeTitle}>{currentListing.attributes.publicData.location.address}</div>
+                      <div className={css.projectTypeTitle}>{currentListing.attributes.publicData.location.address.replace(/, Italia$/, '')}</div>
                     </div>
                   </div>
                 )}

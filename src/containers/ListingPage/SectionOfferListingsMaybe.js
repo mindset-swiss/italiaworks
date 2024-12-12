@@ -114,6 +114,8 @@ const SectionOfferListingsMaybe = props => {
                   }
                 }
 
+                console.log(author);
+
                 return (
                   <Form
                     className={classes}
