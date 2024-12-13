@@ -111,8 +111,6 @@ export const ActionBarMaybe = props => {
     const hasValidType = approvalToPublishOptions?.type && approvalToPublishOptions.type !== 'none';
     const isCTAEnabled = hasValidType && isPendingApproval;
 
-    console.log(message);
-
     return (
       <div
         className={classNames(classes, {

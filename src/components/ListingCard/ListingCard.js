@@ -134,8 +134,6 @@ export const ListingCardComponent = props => {
   
   const ensuredAuthor = ensureUser(currentListing.author);
 
-  console.log(currentListing);
-
   return (
     <NamedLink className={classes} name="ListingPage" params={{ id, slug }}>
       {/* <AspectRatioWrapper

@@ -54,6 +54,7 @@ import {
   NamedRedirect,
   OrderPanel,
   Page,
+  ReviewRatingCustom,
 } from '../../components';
 
 // Related components and modules
@@ -144,17 +145,20 @@ export const ListingPageComponent = props => {
     onCreateSellerListing,
     offerListingItems,
     onUpdateFavorites,
+    userReviews,
   } = props;
 
   useEffect(() => {
-    pushDataLayerEvent({
-      dataLayer: {
-        email: currentUser.attributes.email,
-        title: currentListing.attributes.title,
-        link: window.location.href,
-      },
-      dataLayerName: 'Listing_PageView',
-    });
+    if (currentUser?.attributes?.email && currentUser?.attributes?.title) {
+      pushDataLayerEvent({
+        dataLayer: {
+          email: currentUser.attributes.email,
+          title: currentListing.attributes.title,
+          link: window.location.href,
+        },
+        dataLayerName: 'Listing_PageView',
+      });
+    }
   }, []);
 
   const listingConfig = config.listing;
@@ -420,6 +424,12 @@ export const ListingPageComponent = props => {
     </div>
   );
 
+  const calculateAvgRating = uReviews => {
+    const totalRating = uReviews.reduce((sum, review) => sum + review.attributes.rating, 0);
+
+    return totalRating / uReviews.length;
+  }
+
   return (
     <Page
       title={schemaTitle}
@@ -514,14 +524,22 @@ export const ListingPageComponent = props => {
                       className={css.providerAvatar}
                       disableProfileLink={true}
                     />
-                    <span className={css.providerNameLinked}>
-                      <FormattedMessage
-                        id="OrderPanel.author"
-                        values={{
-                          name: authorDisplayName
-                        }}
-                      />
-                    </span>
+                    <div>
+                      <span className={css.providerNameLinked}>
+                        <FormattedMessage
+                          id="OrderPanel.author"
+                          values={{
+                            name: authorDisplayName
+                          }}
+                        />
+                      </span>
+                      {!!userReviews.length && (
+                        <ReviewRatingCustom
+                          rating={calculateAvgRating(userReviews)}
+                          reviews={userReviews.length}
+                        />
+                      )}
+                    </div>
                   </div>
                 </NamedLink>
 
@@ -637,7 +655,7 @@ export const ListingPageComponent = props => {
                   onManageDisableScrolling={onManageDisableScrolling}
                 /> */}
 
-                <SectionOfferListingsMaybe
+                {/* <SectionOfferListingsMaybe
                   listings={offerListingItems}
                   intl={intl}
                   onInitializeCardPaymentData={onInitializeCardPaymentData}
@@ -645,7 +663,7 @@ export const ListingPageComponent = props => {
                   callSetInitialValues={callSetInitialValues}
                   getListing={getListing}
                   isOwnListing={isOwnListing}
-                />
+                /> */}
               </div>
               <div className={css.orderColumnForProductLayout}>
                 <OrderPanel
@@ -760,6 +778,7 @@ ListingPageComponent.defaultProps = {
   inquiryModalOpenForListingId: null,
   showListingError: null,
   reviews: [],
+  userReviews: [],
   fetchReviewsError: null,
   monthlyTimeSlots: null,
   sendInquiryError: null,
@@ -801,6 +820,7 @@ ListingPageComponent.propTypes = {
   showListingError: propTypes.error,
   callSetInitialValues: func.isRequired,
   reviews: arrayOf(propTypes.review),
+  userReviews: arrayOf(propTypes.review),
   fetchReviewsError: propTypes.error,
   monthlyTimeSlots: object,
   // monthlyTimeSlots could be something like:
@@ -885,6 +905,7 @@ const mapStateToProps = state => {
   const {
     showListingError,
     reviews,
+    userReviews,
     fetchReviewsError,
     monthlyTimeSlots,
     sendInquiryInProgress,
@@ -928,6 +949,7 @@ const mapStateToProps = state => {
     inquiryModalOpenForListingId,
     showListingError,
     reviews,
+    userReviews,
     fetchReviewsError,
     monthlyTimeSlots,
     lineItems,

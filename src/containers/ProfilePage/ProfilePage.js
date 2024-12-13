@@ -467,6 +467,7 @@ const mapStateToProps = state => {
     reviews,
     queryReviewsError,
   } = state.ProfilePage;
+
   const userMatches = getMarketplaceEntities(state, [{ type: 'user', id: userId }]);
   const user = userMatches.length === 1 ? userMatches[0] : null;
 

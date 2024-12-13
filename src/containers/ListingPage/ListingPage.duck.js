@@ -64,12 +64,17 @@ export const ADD_LISTING_OFFER = 'app/ListingPage/ADD_LISTING_OFFER';
 
 export const FETCH_TRANSACTIONS = 'app/ListingPage/FETCH_TRANSACTIONS';
 
+export const QUERY_REVIEWS_REQUEST = 'app/ListingPage/QUERY_REVIEWS_REQUEST';
+export const QUERY_REVIEWS_SUCCESS = 'app/ListingPage/QUERY_REVIEWS_SUCCESS';
+export const QUERY_REVIEWS_ERROR = 'app/ListingPage/QUERY_REVIEWS_ERROR';
+
 // ================ Reducer ================ //
 
 const initialState = {
   id: null,
   showListingError: null,
   reviews: [],
+  userReviews: [],
   fetchReviewsError: null,
   monthlyTimeSlots: {
     // '2022-03': {
@@ -197,6 +202,13 @@ const listingPageReducer = (state = initialState, action = {}) => {
 
     case FETCH_TRANSACTIONS:
       return { ...state, transactionItems: payload.e.data };
+
+    case QUERY_REVIEWS_SUCCESS:
+      return {
+        ...state,
+        userReviews: payload,
+      };
+      
     default:
       return state;
   }
@@ -287,6 +299,21 @@ export const addListingEntities = (sdkResponse, sanitizeConfig) => ({
 export const fetchTransactionItems = e => ({
   type: FETCH_TRANSACTIONS,
   payload: { e },
+});
+
+export const queryReviewsRequest = () => ({
+  type: QUERY_REVIEWS_REQUEST,
+});
+
+export const queryReviewsSuccess = reviews => ({
+  type: QUERY_REVIEWS_SUCCESS,
+  payload: reviews,
+});
+
+export const queryReviewsError = e => ({
+  type: QUERY_REVIEWS_ERROR,
+  error: true,
+  payload: e,
 });
 
 // ================ Thunks ================ //
@@ -574,6 +601,22 @@ export const listingPageOffer = (config, id) => async dispatch => {
   }
 };
 
+export const queryUserReviews = userId => (dispatch, getState, sdk) => {
+  sdk.reviews
+    .query({
+      subject_id: userId,
+      state: 'public',
+    })
+    .then(response => {
+      const userReviews = denormalisedResponseEntities(response);
+
+      console.log(userReviews);
+
+      dispatch(queryReviewsSuccess(userReviews));
+    })
+    .catch(e => dispatch(queryReviewsError(e)));
+};
+
 export const loadData = (params, search, config) => (dispatch, getState, sdk) => {
   const listingId = new UUID(params.id);
   const state = getState();
@@ -601,11 +644,15 @@ export const loadData = (params, search, config) => (dispatch, getState, sdk) =>
   const hasNoViewingRights = currentUser && !hasPermissionToViewData(currentUser);
   const promises = hasNoViewingRights
     ? // If user has no viewing rights, only allow fetching their own listing without reviews
-    [dispatch(showListing(listingId, config, true)),]
+    [
+      dispatch(showListing(listingId, config, true)),
+      dispatch(queryUserReviews(currentUser.id.uuid)),
+    ]
     : // For users with viewing rights, fetch the listing and the associated reviews
     [
       dispatch(showListing(listingId, config)),
       dispatch(fetchReviews(listingId)),
+      dispatch(queryUserReviews(currentUser.id.uuid)),
     ];
 
   return Promise.all(promises).then(response => {

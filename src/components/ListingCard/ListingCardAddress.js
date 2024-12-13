@@ -1,9 +1,6 @@
 import css from "./ListingCard.module.css";
 
 const ListingCardAddress = ({ text, isOnline }) => {
-  console.log(text);
-  console.log(isOnline);
-
   return (
     <div className={css.metaItem}>
       <svg

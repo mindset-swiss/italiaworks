@@ -421,7 +421,6 @@ const OrderPanel = props => {
                   <FormattedMessage id="OrderPanel.customInquiryBudgetFlex" /></>
               ) : null}
             </div>
-            {console.log(currentUser)}
             <div className={css.description}>
               <FormattedMessage id="OrderPanel.customInquiryFormPriceDescription" />
             </div>
