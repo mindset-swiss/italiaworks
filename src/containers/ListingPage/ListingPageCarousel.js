@@ -655,7 +655,7 @@ export const ListingPageComponent = props => {
                   onManageDisableScrolling={onManageDisableScrolling}
                 /> */}
 
-                {/* <SectionOfferListingsMaybe
+                <SectionOfferListingsMaybe
                   listings={offerListingItems}
                   intl={intl}
                   onInitializeCardPaymentData={onInitializeCardPaymentData}
@@ -663,7 +663,7 @@ export const ListingPageComponent = props => {
                   callSetInitialValues={callSetInitialValues}
                   getListing={getListing}
                   isOwnListing={isOwnListing}
-                /> */}
+                />
               </div>
               <div className={css.orderColumnForProductLayout}>
                 <OrderPanel
