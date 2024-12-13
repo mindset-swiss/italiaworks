@@ -146,6 +146,7 @@ export const ListingPageComponent = props => {
     offerListingItems,
     onUpdateFavorites,
     userReviews,
+    offerReviews,
   } = props;
 
   useEffect(() => {
@@ -663,6 +664,8 @@ export const ListingPageComponent = props => {
                   callSetInitialValues={callSetInitialValues}
                   getListing={getListing}
                   isOwnListing={isOwnListing}
+                  offerReviews={offerReviews}
+                  calculateAvgRating={calculateAvgRating}
                 />
               </div>
               <div className={css.orderColumnForProductLayout}>
@@ -779,6 +782,7 @@ ListingPageComponent.defaultProps = {
   showListingError: null,
   reviews: [],
   userReviews: [],
+  offerReviews: {},
   fetchReviewsError: null,
   monthlyTimeSlots: null,
   sendInquiryError: null,
@@ -917,6 +921,7 @@ const mapStateToProps = state => {
     offerListingItems: stateOfferListingItems,
     listingOfferEntities,
     id: listingId,
+    offerReviews,
   } = state.ListingPage;
 
   const { currentUser } = state.user;
@@ -950,6 +955,7 @@ const mapStateToProps = state => {
     showListingError,
     reviews,
     userReviews,
+    offerReviews,
     fetchReviewsError,
     monthlyTimeSlots,
     lineItems,

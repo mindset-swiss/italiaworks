@@ -67,6 +67,8 @@ export const FETCH_TRANSACTIONS = 'app/ListingPage/FETCH_TRANSACTIONS';
 export const QUERY_REVIEWS_REQUEST = 'app/ListingPage/QUERY_REVIEWS_REQUEST';
 export const QUERY_REVIEWS_SUCCESS = 'app/ListingPage/QUERY_REVIEWS_SUCCESS';
 export const QUERY_REVIEWS_ERROR = 'app/ListingPage/QUERY_REVIEWS_ERROR';
+export const QUERY_OFFER_REVIEWS_SUCCESS = 'app/ListingPage/QUERY_OFFER_REVIEWS_SUCCESS';
+export const QUERY_OFFER_REVIEWS_ERROR = 'app/ListingPage/QUERY_OFFER_REVIEWS_ERROR';
 
 // ================ Reducer ================ //
 
@@ -75,6 +77,7 @@ const initialState = {
   showListingError: null,
   reviews: [],
   userReviews: [],
+  offerReviews: [],
   fetchReviewsError: null,
   monthlyTimeSlots: {
     // '2022-03': {
@@ -208,7 +211,13 @@ const listingPageReducer = (state = initialState, action = {}) => {
         ...state,
         userReviews: payload,
       };
-      
+
+    case QUERY_OFFER_REVIEWS_SUCCESS:
+      return {
+        ...state,
+        offerReviews: payload,
+      };
+
     default:
       return state;
   }
@@ -312,6 +321,17 @@ export const queryReviewsSuccess = reviews => ({
 
 export const queryReviewsError = e => ({
   type: QUERY_REVIEWS_ERROR,
+  error: true,
+  payload: e,
+});
+
+export const queryOfferReviewsSuccess = reviews => ({
+  type: QUERY_OFFER_REVIEWS_SUCCESS,
+  payload: reviews,
+});
+
+export const queryOfferReviewsError = e => ({
+  type: QUERY_OFFER_REVIEWS_ERROR,
   error: true,
   payload: e,
 });
@@ -576,6 +596,39 @@ export const getListingsOffeListingById = (listingEntities, listingIds) => {
   return denormalisedEntities(listingEntities, resources, throwIfNotFound);
 };
 
+export const fetchOfferReviews = authorIds => async (dispatch, getState, sdk) => {
+  try {
+    const reviewsByAuthor = {};
+
+    // Map authorIds to Promises for fetching reviews
+    const reviewPromises = authorIds.map(authorId =>
+      sdk.reviews
+        .query({
+          subject_id: authorId,
+          state: 'public',
+        })
+        .then(response => {
+          // Process the response and store reviews under the authorId key
+          reviewsByAuthor[authorId] = denormalisedResponseEntities(response);
+        })
+        .catch(error => {
+          console.error(`Error fetching reviews for author ${authorId}:`, error);
+          // Ensure the authorId key exists even if there are no reviews (or an error occurs)
+          reviewsByAuthor[authorId] = [];
+        })
+    );
+
+    // Wait for all Promises to resolve
+    await Promise.all(reviewPromises);
+
+    // Dispatch success with the reviews object
+    dispatch(queryOfferReviewsSuccess(reviewsByAuthor));
+  } catch (error) {
+    console.error('Error fetching offer reviews:', error);
+    dispatch(queryOfferReviewsError(error));
+  }
+};
+
 export const listingPageOffer = (config, id) => async dispatch => {
   dispatch({
     type: FETCH_LISTING_PAGE_REQUEST,
@@ -586,6 +639,7 @@ export const listingPageOffer = (config, id) => async dispatch => {
       pub_isOffer: true,
       pub_linkedListing: id,
     });
+
     if (listings) {
       const listArray = listings?.data?.data ?? null;
       const sdkResponse = listings?.data || null;
@@ -593,8 +647,14 @@ export const listingPageOffer = (config, id) => async dispatch => {
 
       const listingFields = config?.listing?.listingFields;
       const sanitizeConfig = { listingFields };
+
+      const authorIds = listArray.data.map(listing => {
+        return listing.relationships.author.data.id.uuid;
+      });
+
       dispatch(fetchListingPageSuccess(resultIdsItem));
       dispatch(addListingEntities(sdkResponse, sanitizeConfig));
+      dispatch(fetchOfferReviews(authorIds));
     }
   } catch (err) {
     dispatch(fetchListingPageError(err));
@@ -609,8 +669,6 @@ export const queryUserReviews = userId => (dispatch, getState, sdk) => {
     })
     .then(response => {
       const userReviews = denormalisedResponseEntities(response);
-
-      console.log(userReviews);
 
       dispatch(queryReviewsSuccess(userReviews));
     })

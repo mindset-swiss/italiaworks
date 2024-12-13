@@ -27,6 +27,8 @@ const SectionOfferListingsMaybe = props => {
     rootClassName,
     className,
     isOwnListing,
+    offerReviews,
+    calculateAvgRating
   } = props;
   const routes = useRouteConfiguration();
   const history = useHistory();
@@ -130,10 +132,10 @@ const SectionOfferListingsMaybe = props => {
                           />
                           <div>
                             <div className={css.displayName}>{displayName}</div>
-                            {!!rating && (
+                            {!!offerReviews?.[ensuredAuthor.id.uuid].length && (
                               <ReviewRatingCustom
-                                rating={rating}
-                                reviews={reviews.length}
+                                rating={calculateAvgRating(offerReviews[ensuredAuthor.id.uuid])}
+                                reviews={offerReviews?.[ensuredAuthor.id.uuid].length}
                               />
                             )}
                             {/* {rating ? <ReviewRating
