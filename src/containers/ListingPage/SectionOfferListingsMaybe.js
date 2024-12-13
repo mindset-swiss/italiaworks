@@ -132,7 +132,7 @@ const SectionOfferListingsMaybe = props => {
                           />
                           <div>
                             <div className={css.displayName}>{displayName}</div>
-                            {!!offerReviews?.[ensuredAuthor.id.uuid].length && (
+                            {!!offerReviews?.[ensuredAuthor?.id?.uuid]?.length && (
                               <ReviewRatingCustom
                                 rating={calculateAvgRating(offerReviews[ensuredAuthor.id.uuid])}
                                 reviews={offerReviews?.[ensuredAuthor.id.uuid].length}
