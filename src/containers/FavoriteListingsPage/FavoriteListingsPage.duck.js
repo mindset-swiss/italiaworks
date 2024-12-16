@@ -86,7 +86,7 @@ export const queryFavoriteListings = queryParams => (dispatch, getState, sdk) =>
   const { currentUser } = getState().user;
   const { favorites } = currentUser?.attributes.profile.privateData || {};
 
-  const favoritesMaybe = favorites ? { ids: favorites } : {};
+  const favoritesMaybe = favorites ? { ids: favorites } : { ids: [0] };
   const { perPage, ...rest } = queryParams;
   const params = { ...favoritesMaybe, ...rest, perPage };
 
