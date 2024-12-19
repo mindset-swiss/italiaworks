@@ -206,6 +206,7 @@
 
   color: var(--colorGrey300);
   transition: var(--transitionStyleButton);
+  top: 32px;
 
   &:enabled:hover,
   &:enabled:active {
