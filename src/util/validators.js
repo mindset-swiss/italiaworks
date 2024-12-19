@@ -141,7 +141,7 @@ const isDisposable = debounce(async (email) => {
       email,
     });
 
-    return true;
+    return response;
   } catch (err) {
     console.error(err);
 
