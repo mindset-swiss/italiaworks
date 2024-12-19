@@ -132,7 +132,7 @@
 }
 
 .ownListingText {
-  font-size: 12px;
+  font-size: 16px;
   line-height: 1.33;
   margin: 0;
 }
@@ -161,7 +161,7 @@
 .editListingLink {
   margin: 0;
   color: #4b4b4f;
-  font-size: 12px;
+  font-size: 16px;
   line-height: 1.33;
 }
 
@@ -854,7 +854,7 @@
 .bio {
   /* Preserve newlines, but collapse other whitespace */
   white-space: pre-line;
-  font-size: 14px;
+  font-size: 16px;
   line-height: 1.29;
   padding: 0;
   margin: 0;
@@ -876,7 +876,7 @@
   max-height: 46.2px;
   font-weight: 500;
   line-height: 1.1;
-  font-size: 14px;
+  font-size: 16px;
   overflow: hidden;
   text-overflow: ellipsis;
   -webkit-line-clamp: 3;
@@ -946,8 +946,9 @@
 }
 
 .date {
-  font-size: 12px;
+  font-size: 16px;
   line-height: 1.33;
+  margin-top:0.5rem;
   text-transform: capitalize;
 }
 

@@ -310,7 +310,7 @@
 
 .customInquiryBudget {
   text-align: center;
-  font-size: 12px;
+  font-size: 16px;
   line-height: 1.33;
   font-weight: 700;
   color: var(--colorGrey700);
@@ -320,9 +320,8 @@
 
 .customInquiryBudgetFlex {
   text-align: center;
-  font-size: 10px;
+  font-size: 14px;
   line-height: 1.6;
-  font-weight: 400;
   color: #4b4b4f;
   display: flex;
   gap: 4px;
@@ -331,7 +330,7 @@
 }
 
 .description {
-  font-size: 12px;
+  font-size: 14px;
   line-height: 1.33;
   max-width: 178px;
   margin-left: auto;
