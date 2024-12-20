@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { compose } from 'redux';
 import { withRouter } from 'react-router-dom';
 import classNames from 'classnames';
+import moment from 'moment';
 
 import { useConfiguration } from '../../../context/configurationContext';
 import { useRouteConfiguration } from '../../../context/routeConfigurationContext';
@@ -43,11 +44,16 @@ import {
 import MenuIcon from './MenuIcon';
 import Overlay from './Overlay';
 import css from './ManageListingCard.module.css';
+import { richText } from '../../../util/richText';
+import { AvatarMedium } from '../../../components';
+import ListingCardAddress from '../../../components/ListingCard/ListingCardAddress';
+import ListingCardDate from '../../../components/ListingCard/ListingCardDate';
 
 // Menu content needs the same padding
 const MENU_CONTENT_OFFSET = -12;
 const MAX_LENGTH_FOR_WORDS_IN_TITLE = 7;
 const MOBILE_MAX_WIDTH = 550;
+const MIN_LENGTH_FOR_LONG_WORDS = 10;
 
 const priceData = (price, currency, intl) => {
   if (price?.currency === currency) {
@@ -76,23 +82,23 @@ const createListingURL = (routes, listing) => {
   const variant = isDraft
     ? LISTING_PAGE_DRAFT_VARIANT
     : isPendingApproval
-    ? LISTING_PAGE_PENDING_APPROVAL_VARIANT
-    : null;
+      ? LISTING_PAGE_PENDING_APPROVAL_VARIANT
+      : null;
 
   const linkProps =
     isPendingApproval || isDraft
       ? {
-          name: 'ListingPageVariant',
-          params: {
-            id,
-            slug,
-            variant,
-          },
-        }
+        name: 'ListingPageVariant',
+        params: {
+          id,
+          slug,
+          variant,
+        },
+      }
       : {
-          name: 'ListingPage',
-          params: { id, slug },
-        };
+        name: 'ListingPage',
+        params: { id, slug },
+      };
 
   return createResourceLocatorString(linkProps.name, routes, linkProps.params, {});
 };
@@ -448,6 +454,65 @@ export const ManageListingCardComponent = props => {
     ? Object.keys(firstImage?.attributes?.variants).filter(k => k.startsWith(variantPrefix))
     : [];
 
+  const capitalizeFirstLetter = val => {
+    return `${String(val).charAt(0).toUpperCase()}${String(val).slice(1)}`;
+  }
+
+  let address = '';
+  let isOnline = false;
+
+  if (currentListing?.attributes?.publicData?.location?.address) {
+    address = currentListing.attributes.publicData.location.address;
+  } else if (currentListing?.attributes?.publicData?.project_type && currentListing.attributes.publicData.project_type === 'online') {
+    address = <FormattedMessage id="ListingPage.online" />;
+    isOnline = true;
+  }
+
+  let selectedDate = '';
+
+  if (currentListing?.attributes?.publicData?.selectedDate || currentListing?.attributes?.publicData?.selectedOption) {
+    if (currentListing?.attributes?.publicData?.selectedOption === 'Sono flessibile') {
+      selectedDate = currentListing.attributes.publicData.selectedOption;
+    } else {
+      selectedDate = `${currentListing?.attributes?.publicData?.selectedOption ? `${currentListing.attributes.publicData.selectedOption}: ` : ''}${currentListing?.attributes?.publicData?.selectedDate ? capitalizeFirstLetter(moment(currentListing.attributes.publicData.selectedDate).format('dddd D MMMM, YYYY')) : ''}`;
+    }
+  }
+
+  const renderTitle = () => {
+    if (isDraft) {
+      return intl.formatMessage(
+        { id: 'ManageListingCard.draftOverlayText' },
+        { listingTitle: title }
+      );
+    }
+
+    if (isClosed) {
+      return intl.formatMessage(
+        { id: 'ManageListingCard.closedListing' },
+        { listingTitle: title }
+      );
+    }
+
+    if (isPendingApproval) {
+      return intl.formatMessage(
+        { id: 'ManageListingCard.pendingApproval' },
+        { listingTitle: title }
+      );
+    }
+
+    if (showOutOfStockOverlay) {
+      return intl.formatMessage(
+        { id: 'ManageListingCard.outOfStockOverlayText' },
+        { listingTitle: title }
+      );
+    }
+
+    return richText(title, {
+      longWordMinLength: MIN_LENGTH_FOR_LONG_WORDS,
+      longWordClass: css.longWord,
+    });
+  }
+
   return (
     <div className={classes}>
       <div
@@ -462,12 +527,15 @@ export const ManageListingCardComponent = props => {
           //
           // NOTE: It might be better to absolute-position those buttons over a card-links.
           // (So, that they have no parent-child relationship - like '<a>bla<a>blaa</a></a>')
-          history.push(createListingURL(routeConfiguration, listing));
+
+          if (!isDraft && !isPendingApproval) {
+            history.push(createListingURL(routeConfiguration, listing));
+          }
         }}
         onMouseOver={onOverListingLink}
         onTouchStart={onOverListingLink}
       >
-        <AspectRatioWrapper width={aspectWidth} height={aspectHeight}>
+        {/* <AspectRatioWrapper width={aspectWidth} height={aspectHeight}>
           <ResponsiveImage
             rootClassName={css.rootForImage}
             alt={title}
@@ -475,13 +543,13 @@ export const ManageListingCardComponent = props => {
             variants={variants}
             sizes={renderSizes}
           />
-        </AspectRatioWrapper>
+        </AspectRatioWrapper> */}
 
         <div className={classNames(css.menuOverlayWrapper)}>
           <div className={classNames(css.menuOverlay, { [css.menuOverlayOpen]: isMenuOpen })} />
         </div>
         <div className={css.menubarWrapper}>
-          <div className={css.menubarGradient} />
+          {/* <div className={css.menubarGradient} /> */}
           <div className={css.menubar}>
             <Menu
               className={classNames(css.menu, { [css.cardIsOpen]: !isClosed })}
@@ -516,12 +584,50 @@ export const ManageListingCardComponent = props => {
                     <FormattedMessage id="ManageListingCard.closeListing" />
                   </InlineTextButton>
                 </MenuItem>
+                {isDraft && (
+                  <>
+                    <MenuItem key="finish-draft">
+                      <NamedLink
+                        className={menuItemClasses}
+                        name="EditListingPage"
+                        params={{ id, slug, type: LISTING_PAGE_PARAM_TYPE_DRAFT, tab: 'photos' }}
+                      >
+                        <FormattedMessage id="ManageListingCard.finishListingDraft" />
+                      </NamedLink>
+                    </MenuItem>
+                    <MenuItem key="discard-draft">
+                      <InlineTextButton
+                        key="discardDraftLink"
+                        rootClassName={menuItemClasses}
+                        disabled={!!actionsInProgressListingId}
+                        onClick={() => {
+                          if (!actionsInProgressListingId) {
+                            onDiscardDraft(currentListing.id.uuid);
+                          }
+                        }}
+                      >
+                        <FormattedMessage id="ManageListingCard.discardDraftLinkText" />
+                      </InlineTextButton>
+                    </MenuItem>
+                  </>
+                )}
+                {isClosed && hasStockManagementInUse(
+                  <>
+                    <NamedLink
+                      className={menuItemClasses}
+                      name="EditListingPage"
+                      params={{ id, slug, type: LISTING_PAGE_PARAM_TYPE_EDIT, tab: 'pricing-and-stock' }}
+                    >
+                      <FormattedMessage id="ManageListingCard.setPriceAndStock" />
+                    </NamedLink>
+                  </>
+                )}
               </MenuContent>
             </Menu>
           </div>
         </div>
 
-        <ShowFinishDraftOverlayMaybe
+        {/* <ShowFinishDraftOverlayMaybe
           isDraft={isDraft}
           title={title}
           id={id}
@@ -531,9 +637,9 @@ export const ManageListingCardComponent = props => {
           actionsInProgressListingId={actionsInProgressListingId}
           currentListingId={currentListing.id}
           onDiscardDraft={onDiscardDraft}
-        />
+        /> */}
 
-        <ShowClosedOverlayMaybe
+        {/* <ShowClosedOverlayMaybe
           isClosed={isClosed}
           title={title}
           actionsInProgressListingId={actionsInProgressListingId}
@@ -558,7 +664,7 @@ export const ManageListingCardComponent = props => {
           onCloseListing={onCloseListing}
           hasStockManagementInUse={hasStockManagementInUse}
           intl={intl}
-        />
+        /> */}
 
         {thisListingInProgress ? (
           <Overlay>
@@ -569,7 +675,31 @@ export const ManageListingCardComponent = props => {
         ) : null}
       </div>
 
-      <div className={css.info}>
+      <div className={css.card}>
+        <div className={css.mainInfo}>
+          <div className={css.title}>
+            {renderTitle()}
+          </div>
+          <div className={css.meta}>
+            {!!address && (
+              <ListingCardAddress
+                text={address}
+                isOnline={isOnline}
+              />
+            )}
+            {!!selectedDate && <ListingCardDate text={selectedDate} />}
+            {/* TODO: get offers count */}
+            {/* <ListingCardOffers /> */}
+          </div>
+          {/* TODO: listing status In cerca/Assegnato */}
+          {/* <div className={css.status}>In cerca</div> */}
+        </div>
+        <div className={css.aside}>
+          <PriceMaybe price={price} publicData={publicData} config={config} intl={intl} />
+        </div>
+      </div>
+
+      {/* <div className={css.info}>
         <PriceMaybe price={price} publicData={publicData} config={config} intl={intl} />
 
         <div className={css.mainInfo}>
@@ -607,7 +737,7 @@ export const ManageListingCardComponent = props => {
             intl={intl}
           />
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };
