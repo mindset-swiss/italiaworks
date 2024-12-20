@@ -134,6 +134,8 @@ const TopbarMobileMenu = props => {
   };
   const inboxTab = currentUserHasListings ? 'sales' : 'orders';
 
+  if (!user) return null;
+
   return (
     <div className={css.root}>
       <AvatarLarge className={css.avatar} user={currentUser} />
@@ -154,17 +156,19 @@ const TopbarMobileMenu = props => {
             <FormattedMessage id="TopbarMobileMenu.inboxLink" />
             {notificationCountBadge}
           </NamedLink>
-          <NamedLink
-            className={classNames(css.navigationLink, currentPageClass('ProfilePageVariant'))}
-            name="ProfilePageVariant"
-            params={{
-              id: user.id.uuid,
-              variant: PROFILE_PAGE_PENDING_APPROVAL_VARIANT
-            }}
-          >
-            <span className={css.menuItemBorder} />
-            <FormattedMessage id="TopbarMobileMenu.yourProfilePage" />
-          </NamedLink>
+          {currentUser?.id?.uuid && (
+            <NamedLink
+              className={classNames(css.navigationLink, currentPageClass('ProfilePageVariant'))}
+              name="ProfilePageVariant"
+              params={{
+                id: currentUser.id.uuid,
+                variant: PROFILE_PAGE_PENDING_APPROVAL_VARIANT
+              }}
+            >
+              <span className={css.menuItemBorder} />
+              <FormattedMessage id="TopbarMobileMenu.yourProfilePage" />
+            </NamedLink>
+          )}
           <NamedLink
             className={classNames(css.navigationLink, currentPageClass('ManageListingsPage'))}
             name="ManageListingsPage"

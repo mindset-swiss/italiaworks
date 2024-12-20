@@ -65,6 +65,8 @@ const ProfileMenu = ({ currentPage, currentUser, onLogout }) => {
     return currentPage === page || isAccountSettingsPage ? css.currentPage : null;
   };
 
+  if (!currentUser) return null;
+
   return (
     <Menu>
       <MenuLabel className={css.profileMenuLabel} isOpenClassName={css.profileMenuIsOpen}>
