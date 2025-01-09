@@ -323,3 +323,146 @@
   width: 100%;
   height: 100%;
 }
+
+.flexCertification {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding: 20px 0px;
+}
+
+.thumbImage {
+  width: 100%;
+  height: 200px;
+}
+
+.thumbFile {
+  /* Layout */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  /* Size */
+  /* height: 100%;
+  width: 100%; */
+  padding: 0 12px;
+
+  /* Style */
+  background-color: var(--colorGrey100);
+  width: 100%;
+  height: 200px;
+}
+
+.thumbFileText {
+  /* Font */
+  font-size: 14px;
+  line-height: 18px;
+  text-align: center;
+
+  /* Limit text to 2 lines */
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  word-break: break-all;
+}
+
+.thumb {
+  position: relative;
+
+  /* Layout */
+  display: inline-flex;
+  padding: 4px;
+  height: 200px;
+  width: 44%;
+
+  /* Style */
+  border-radius: 2px;
+  border: 1px solid var(--marketplaceColor);
+}
+
+.thumbInner {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+}
+
+.actionButtons {
+  /* Layout */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+
+  /* Position */
+  position: absolute;
+  display: flex;
+  top: 10px;
+  left: 0;
+  right: 0;
+  padding: 0 calc(4px + 8px);
+  z-index: 1;
+}
+
+.reviewBtton {
+  padding: 8px;
+  border: 1px solid black;
+  border-radius: 4px;
+  width: max-content;
+  margin: 12px 0px;
+  cursor: pointer;
+}
+
+.reviewBtton:hover {
+  background-color: var(--marketplaceColor);
+  color: white;
+}
+
+.reviewContent {
+  composes: textSmall from global;
+  font-style: italic;
+  margin: 0;
+  white-space: pre-line;
+}
+
+.publicReviewTitle {
+  font-size: large;
+  margin-bottom: 12px;
+  font-weight: bold;
+}
+
+.publicReview {
+  padding: 12px 0px;
+}
+
+.publicReviewContent {
+  padding: 16px 0px;
+}
+
+.publicReviewComponent {
+  padding: 20px 0px;
+}
+
+.publicReviewName {
+  display: flex;
+  gap: 8px;
+  text-align: center;
+  color: lightgrey;
+  font-size: 12px;
+  font-weight: bold;
+}
+.displayFlex {
+  display: flex;
+  gap: 4px;
+  padding: 4px 0px;
+}
+
+.displayFlexDesktop {
+  display: none;
+
+  @media (--viewportLarge) {
+    display: flex;
+    gap: 4px;
+  }
+}

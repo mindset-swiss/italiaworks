@@ -20,6 +20,13 @@ const createUserWithIdp = require('./api/auth/createUserWithIdp');
 
 const { authenticateFacebook, authenticateFacebookCallback } = require('./api/auth/facebook');
 const { authenticateGoogle, authenticateGoogleCallback } = require('./api/auth/google');
+const offerListingPage = require('./api/offer-listing-page');
+const ping = require('./api/ping');
+const { upload, uploadS3 } = require('./AWS/uploadFile');
+const uploadS3Endpoint = require('./api/upload-s3');
+const updateOfferListing = require('./api/update-offer-listing');
+const getProfileUser = require('./api/get-user-info');
+const updatePublicReview = require('./api/update-public-review');
 
 const router = express.Router();
 
@@ -79,5 +86,12 @@ router.get('/auth/google', authenticateGoogle);
 // with Google. In this route a Passport.js custom callback is used for calling
 // loginWithIdp endpoint in Sharetribe Auth API to authenticate user to the marketplace
 router.get('/auth/google/callback', authenticateGoogleCallback);
+
+router.post('/offer-listing-page', offerListingPage);
+router.get('/ping', ping);
+router.post('/upload-s3', upload.array('files'), uploadS3, uploadS3Endpoint);
+router.post('/update-offer-listing', updateOfferListing);
+router.post('/get-user-info', getProfileUser);
+router.post('/update-public-review',updatePublicReview);
 
 module.exports = router;

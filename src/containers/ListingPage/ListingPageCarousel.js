@@ -1,90 +1,105 @@
+import { array, arrayOf, bool, func, object, oneOf, shape, string } from 'prop-types';
 import React, { useState } from 'react';
-import { array, arrayOf, bool, func, shape, string, oneOf, object } from 'prop-types';
-import { compose } from 'redux';
 import { connect } from 'react-redux';
 import { useHistory, useLocation } from 'react-router-dom';
+import { compose } from 'redux';
 
 // Contexts
 import { useConfiguration } from '../../context/configurationContext';
 import { useRouteConfiguration } from '../../context/routeConfigurationContext';
 // Utils
-import { FormattedMessage, intlShape, useIntl } from '../../util/reactIntl';
-import { LISTING_STATE_PENDING_APPROVAL, LISTING_STATE_CLOSED, propTypes } from '../../util/types';
-import { types as sdkTypes } from '../../util/sdkLoader';
 import {
-  LISTING_PAGE_DRAFT_VARIANT,
-  LISTING_PAGE_PENDING_APPROVAL_VARIANT,
-  LISTING_PAGE_PARAM_TYPE_DRAFT,
-  LISTING_PAGE_PARAM_TYPE_EDIT,
-  createSlug,
-  NO_ACCESS_PAGE_USER_PENDING_APPROVAL,
-  NO_ACCESS_PAGE_VIEW_LISTINGS,
-} from '../../util/urlHelpers';
-import {
-  isErrorNoViewingPermission,
-  isErrorUserPendingApproval,
-  isForbiddenError,
-} from '../../util/errors.js';
-import { hasPermissionToViewData, isUserAuthorized } from '../../util/userHelpers.js';
+  isBookingProcess,
+  isPurchaseProcess,
+  resolveLatestProcessName,
+} from '../../transactions/transaction';
 import {
   ensureListing,
   ensureOwnListing,
   ensureUser,
   userDisplayNameAsString,
 } from '../../util/data';
-import { richText } from '../../util/richText';
 import {
-  isBookingProcess,
-  isPurchaseProcess,
-  resolveLatestProcessName,
-} from '../../transactions/transaction';
+  isErrorNoViewingPermission,
+  isErrorUserPendingApproval,
+  isForbiddenError,
+} from '../../util/errors.js';
+import { FormattedMessage, intlShape, useIntl } from '../../util/reactIntl';
+import { richText } from '../../util/richText';
+import { types as sdkTypes } from '../../util/sdkLoader';
+import { LISTING_STATE_CLOSED, LISTING_STATE_PENDING_APPROVAL, propTypes } from '../../util/types';
+import {
+  createSlug,
+  LISTING_PAGE_DRAFT_VARIANT,
+  LISTING_PAGE_PARAM_TYPE_DRAFT,
+  LISTING_PAGE_PARAM_TYPE_EDIT,
+  LISTING_PAGE_PENDING_APPROVAL_VARIANT,
+  NO_ACCESS_PAGE_USER_PENDING_APPROVAL,
+  NO_ACCESS_PAGE_VIEW_LISTINGS,
+} from '../../util/urlHelpers';
+import { hasPermissionToViewData, isUserAuthorized } from '../../util/userHelpers.js';
 
 // Global ducks (for Redux actions and thunks)
 import { getMarketplaceEntities } from '../../ducks/marketplaceData.duck';
-import { manageDisableScrolling, isScrollingDisabled } from '../../ducks/ui.duck';
 import { initializeCardPaymentData } from '../../ducks/stripe.duck.js';
+import { isScrollingDisabled, manageDisableScrolling } from '../../ducks/ui.duck';
 
 // Shared components
 import {
+  AvatarMedium,
   H4,
-  Page,
+  LayoutSingleColumn,
+  Modal,
   NamedLink,
   NamedRedirect,
   OrderPanel,
-  LayoutSingleColumn,
+  Page,
 } from '../../components';
 
 // Related components and modules
-import TopbarContainer from '../TopbarContainer/TopbarContainer';
 import FooterContainer from '../FooterContainer/FooterContainer';
 import NotFoundPage from '../NotFoundPage/NotFoundPage';
+import TopbarContainer from '../TopbarContainer/TopbarContainer';
 
 import {
-  sendInquiry,
-  setInitialValues,
+  createSellerListing,
   fetchTimeSlots,
   fetchTransactionLineItems,
+  getListingsOffeListingById,
+  sendInquiry,
+  setInitialValues,
+  updateOfferForm,
 } from './ListingPage.duck';
 
+import ActionBarMaybe from './ActionBarMaybe';
 import {
-  LoadingPage,
   ErrorPage,
-  priceData,
-  listingImages,
   handleContactUser,
-  handleSubmitInquiry,
   handleSubmit,
+  handleSubmitCheckoutPageWithInquiry,
+  handleSubmitInquiry,
+  handleUpdateOffer,
+  listingImages,
+  LoadingPage,
+  priceData,
   priceForSchemaMaybe,
 } from './ListingPage.shared';
-import ActionBarMaybe from './ActionBarMaybe';
-import SectionTextMaybe from './SectionTextMaybe';
-import SectionReviews from './SectionReviews';
-import SectionAuthorMaybe from './SectionAuthorMaybe';
 import SectionMapMaybe from './SectionMapMaybe';
-import SectionGallery from './SectionGallery';
-import CustomListingFields from './CustomListingFields';
+import SectionTextMaybe from './SectionTextMaybe';
 
+import { initiateInquiryWithoutPayment } from '../CheckoutPage/CheckoutPage.duck.js';
+import { onSubmitCallback, STORAGE_KEY } from '../CheckoutPage/CheckoutPage.js';
+import { handlePageData } from '../CheckoutPage/CheckoutPageSessionHelpers.js';
+import CustomInquiryForm from './CustomInquiryForm/CustomInquiryForm.js';
 import css from './ListingPage.module.css';
+
+import moment from 'moment';
+import dateSVG from '../../assets/date.svg';
+import locationSVG from '../../assets/location.svg';
+import { MIN_LENGTH_FOR_LONG_WORDS } from '../ProfilePage/ProfilePage.js';
+import SectionGallery from './SectionGallery.js';
+import SectionOfferListingsMaybe from './SectionOfferListingsMaybe.js';
+import UpdateOfferForm from './UpdateOfferForm/UpdateOfferForm.js';
 
 const MIN_LENGTH_FOR_LONG_WORDS_IN_TITLE = 16;
 
@@ -94,6 +109,10 @@ export const ListingPageComponent = props => {
   const [inquiryModalOpen, setInquiryModalOpen] = useState(
     props.inquiryModalOpenForListingId === props.params.id
   );
+
+  const [customInquiryModalOpen, setCustomInquiryModalOpen] = useState(false);
+  const [updateOfferModalOpen, setUpdateOfferModalOpen] = useState(false);
+  const [selectedListing, setSelectedListing] = useState(null);
 
   const {
     isAuthenticated,
@@ -123,10 +142,15 @@ export const ListingPageComponent = props => {
     config,
     routeConfiguration,
     showOwnListingsOnly,
+    onInquiryWithoutPayment,
+    onCreateSellerListing,
+    offerListingItems,
+    onUpdateOffer,
   } = props;
 
   const listingConfig = config.listing;
   const listingId = new UUID(rawParams.id);
+  const isVariant = rawParams.variant != null;
   const isPendingApprovalVariant = rawParams.variant === LISTING_PAGE_PENDING_APPROVAL_VARIANT;
   const isDraftVariant = rawParams.variant === LISTING_PAGE_DRAFT_VARIANT;
   const currentListing =
@@ -198,7 +222,15 @@ export const ListingPageComponent = props => {
   const isOwnListing =
     userAndListingAuthorAvailable && currentListing.author.id.uuid === currentUser.id.uuid;
 
-  const { listingType, transactionProcessAlias, unitType } = publicData;
+  const {
+    listingType,
+    transactionProcessAlias,
+    unitType,
+    project_type,
+    flex_price,
+    selectedDate,
+  } = publicData;
+
   if (!(listingType && transactionProcessAlias && unitType)) {
     // Listing should always contain listingType, transactionProcessAlias and unitType)
     return (
@@ -213,7 +245,7 @@ export const ListingPageComponent = props => {
   const currentAuthor = authorAvailable ? currentListing.author : null;
   const ensuredAuthor = ensureUser(currentAuthor);
   const noPayoutDetailsSetWithOwnListing =
-    isOwnListing && (processType !== 'inquiry' && !currentUser?.attributes?.stripeConnected);
+    isOwnListing && processType !== 'inquiry' && !currentUser?.attributes?.stripeConnected;
   const payoutDetailsWarning = noPayoutDetailsSetWithOwnListing ? (
     <span className={css.payoutDetailsWarning}>
       <FormattedMessage id="ListingPage.payoutDetailsWarning" values={{ processType }} />
@@ -286,6 +318,31 @@ export const ListingPageComponent = props => {
     : 'https://schema.org/OutOfStock';
 
   const availabilityMaybe = schemaAvailability ? { availability: schemaAvailability } : {};
+  const orderData = { deliveryMethod: 'none' };
+  const transaction = null;
+  const initialData = { orderData, listing: currentListing, transaction };
+  const pageData = handlePageData(initialData, STORAGE_KEY, history);
+
+  const handleInquiryFormSubmit = handleSubmitCheckoutPageWithInquiry({
+    ...commonParams,
+    config,
+    processName,
+    pageData,
+    onInquiryWithoutPayment,
+    onSubmitCallback,
+    onCreateSellerListing,
+  });
+
+  const handleUpdateOffeSubmit = handleUpdateOffer({
+    onUpdateOffer,
+  });
+
+  const displayDate = selectedDate ? moment(selectedDate).format('dddd, MMMM Do YYYY') : null;
+  const descriptionWithLinks = richText(description, {
+    linkify: true,
+    longWordMinLength: MIN_LENGTH_FOR_LONG_WORDS,
+    longWordClass: css.longWord,
+  });
 
   return (
     <Page
@@ -335,33 +392,111 @@ export const ListingPageComponent = props => {
                 }}
               />
             ) : null}
-            <SectionGallery
-              listing={currentListing}
-              variantPrefix={config.layout.listingImage.variantPrefix}
-            />
-            <div className={css.mobileHeading}>
+            {/* <div className={css.mobileHeading}>
               <H4 as="h1" className={css.orderPanelTitle}>
                 <FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />
               </H4>
-            </div>
-            <SectionTextMaybe text={description} showAsIngress />
+            </div> */}
+            <SectionTextMaybe text={title} showAsIngress />
+            {/* <SectionTextMaybe text={description} showAsIngress /> */}
 
-            <CustomListingFields
+            <div className={css.author}>
+              <AvatarMedium user={ensuredAuthor} className={css.providerAvatar} />
+              <span className={css.providerNameLinked}>
+                <FormattedMessage
+                  id="OrderPanel.author"
+                  values={{
+                    name: (
+                      <NamedLink
+                        className={css.authorNameLink}
+                        name="ListingPage"
+                        params={params}
+                        to={{ hash: '#author' }}
+                      >
+                        {authorDisplayName}
+                      </NamedLink>
+                    ),
+                  }}
+                />
+              </span>
+              <span className={css.providerNamePlain}>
+                <FormattedMessage id="OrderPanel.author" values={{ name: authorDisplayName }} />
+              </span>
+            </div>
+
+            {/* <CustomListingFields
               publicData={publicData}
               metadata={metadata}
               listingFieldConfigs={listingConfig.listingFields}
               categoryConfiguration={config.categoryConfiguration}
               intl={intl}
+            /> */}
+
+            {project_type && project_type === 'online' ? (
+              <div className={css.projectTypeContent}>
+                <div>
+                  <img src={locationSVG} />
+                </div>
+                <div>
+                  <div className={css.projectTypeTopic}>
+                    <FormattedMessage id="ListingPage.ListingPageCarousel.working" />
+                  </div>
+                  <div className={css.projectTypeTitle}>{project_type}</div>
+                </div>
+              </div>
+            ) : (
+              <div>
+                <div className={css.projectTypeContent}>
+                  <div>
+                    <img src={locationSVG} />
+                  </div>
+                  <div>
+                    <div className={css.projectTypeTopic}>
+                      <FormattedMessage id="ListingPage.ListingPageCarousel.working" />
+                    </div>
+                    <div className={css.projectTypeTitle}>{project_type}</div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {displayDate ? (
+              <div className={css.projectTypeContent}>
+                <div>
+                  <img src={dateSVG} />
+                </div>
+                <div>
+                  <div className={css.projectTypeTopic}>
+                    <FormattedMessage id="ListingPage.ListingPageCarousel.date" />
+                  </div>
+                  <div className={css.projectTypeTitle}>{displayDate}</div>
+                </div>
+              </div>
+            ) : null}
+
+            {project_type && project_type !== 'online' ? (
+              <SectionMapMaybe
+                geolocation={geolocation}
+                publicData={publicData}
+                listingId={currentListing.id}
+                mapsConfig={config.maps}
+              />
+            ) : null}
+
+            <div className={css.marginContent}>
+              <H4>
+                <FormattedMessage id="ListingPage.ListingPageCarousel.detailsTitle" />
+              </H4>
+              <p className={css.bio}>{descriptionWithLinks}</p>
+            </div>
+
+            <SectionGallery
+              listing={currentListing}
+              variantPrefix={config.layout.listingImage.variantPrefix}
             />
 
-            <SectionMapMaybe
-              geolocation={geolocation}
-              publicData={publicData}
-              listingId={currentListing.id}
-              mapsConfig={config.maps}
-            />
-            <SectionReviews reviews={reviews} fetchReviewsError={fetchReviewsError} />
-            <SectionAuthorMaybe
+            {/* <SectionReviews reviews={reviews} fetchReviewsError={fetchReviewsError} /> */}
+            {/* <SectionAuthorMaybe
               title={title}
               listing={currentListing}
               authorDisplayName={authorDisplayName}
@@ -373,18 +508,45 @@ export const ListingPageComponent = props => {
               onSubmitInquiry={onSubmitInquiry}
               currentUser={currentUser}
               onManageDisableScrolling={onManageDisableScrolling}
-            />
+            /> */}
+
+            {offerListingItems &&
+            Array.isArray(offerListingItems) &&
+            offerListingItems.length > 0 ? (
+              <SectionOfferListingsMaybe
+                listings={offerListingItems}
+                intl={intl}
+                onInitializeCardPaymentData={onInitializeCardPaymentData}
+                currentUser={currentUser}
+                callSetInitialValues={callSetInitialValues}
+                getListing={getListing}
+                isOwnListing={isOwnListing}
+                setUpdateOfferModalOpen={setUpdateOfferModalOpen}
+                setSelectedListing={setSelectedListing}
+              />
+            ) : (
+              <H4>
+                <FormattedMessage
+                  id="ListingPage.SectionOfferListingsMaybe.title"
+                  values={{
+                    value: <span style={{ fontWeight: 'bold' }}>0</span>,
+                  }}
+                />
+              </H4>
+            )}
           </div>
           <div className={css.orderColumnForProductLayout}>
             <OrderPanel
               className={css.productOrderPanel}
               listing={currentListing}
+              currentUser={currentUser}
+              routes={routeConfiguration}
               isOwnListing={isOwnListing}
               onSubmit={handleOrderSubmit}
               authorLink={
                 <NamedLink
                   className={css.authorNameLink}
-                  name="ListingPage"
+                  name={isVariant ? 'ListingPageVariant' : 'ListingPage'}
                   params={params}
                   to={{ hash: '#author' }}
                 >
@@ -411,8 +573,55 @@ export const ListingPageComponent = props => {
               marketplaceCurrency={config.currency}
               dayCountAvailableForBooking={config.stripe.dayCountAvailableForBooking}
               marketplaceName={config.marketplaceName}
+              setInquiryModalOpen={setCustomInquiryModalOpen}
             />
           </div>
+          <Modal
+            id="ListingPage.inquiry"
+            contentClassName={css.inquiryModalContent}
+            isOpen={isAuthenticated && customInquiryModalOpen}
+            onClose={() => setCustomInquiryModalOpen(false)}
+            usePortal
+            onManageDisableScrolling={onManageDisableScrolling}
+          >
+            <CustomInquiryForm
+              className={css.inquiryForm}
+              submitButtonWrapperClassName={css.inquirySubmitButtonWrapper}
+              listingTitle={title}
+              authorDisplayName={authorDisplayName}
+              sendInquiryError={sendInquiryError}
+              onSubmit={handleInquiryFormSubmit}
+              inProgress={sendInquiryInProgress}
+              marketplaceCurrency={config.currency}
+              offerPrice={price}
+              flex_price={Array.isArray(flex_price) && flex_price.length > 0}
+              listing={currentListing}
+            />
+          </Modal>
+
+          <Modal
+            id="ListingPage.editOffer"
+            contentClassName={css.inquiryModalContent}
+            isOpen={isAuthenticated && updateOfferModalOpen}
+            onClose={() => setUpdateOfferModalOpen(false)}
+            usePortal
+            onManageDisableScrolling={onManageDisableScrolling}
+          >
+            {selectedListing ? (
+              <UpdateOfferForm
+                className={css.inquiryForm}
+                submitButtonWrapperClassName={css.inquirySubmitButtonWrapper}
+                listingTitle={title}
+                authorDisplayName={authorDisplayName}
+                sendInquiryError={sendInquiryError}
+                onSubmit={handleUpdateOffeSubmit}
+                inProgress={sendInquiryInProgress}
+                marketplaceCurrency={config.currency}
+                listing={selectedListing}
+                flex_price={Array.isArray(flex_price) && flex_price.length > 0}
+              />
+            ) : null}
+          </Modal>
         </div>
       </LayoutSingleColumn>
     </Page>
@@ -493,7 +702,7 @@ const EnhancedListingPage = props => {
   const location = useLocation();
 
   const showListingError = props.showListingError;
-  const isVariant = props.params?.variant?.length > 0;
+  const isVariant = props.params?.variant != null;
   const currentUser = props.currentUser;
   if (isForbiddenError(showListingError) && !isVariant && !currentUser) {
     // This can happen if private marketplace mode is active
@@ -557,8 +766,17 @@ const mapStateToProps = state => {
     fetchLineItemsInProgress,
     fetchLineItemsError,
     inquiryModalOpenForListingId,
+    offerListingItems: stateOfferListingItems,
+    listingOfferEntities,
+    id: listingId,
   } = state.ListingPage;
+
   const { currentUser } = state.user;
+
+  const offerListingItems =
+    stateOfferListingItems && listingOfferEntities
+      ? getListingsOffeListingById(listingOfferEntities, stateOfferListingItems)
+      : null;
 
   const getListing = id => {
     const ref = { id, type: 'listing' };
@@ -588,6 +806,7 @@ const mapStateToProps = state => {
     fetchLineItemsError,
     sendInquiryInProgress,
     sendInquiryError,
+    offerListingItems,
   };
 };
 
@@ -601,6 +820,11 @@ const mapDispatchToProps = dispatch => ({
   onInitializeCardPaymentData: () => dispatch(initializeCardPaymentData()),
   onFetchTimeSlots: (listingId, start, end, timeZone) =>
     dispatch(fetchTimeSlots(listingId, start, end, timeZone)),
+  onInquiryWithoutPayment: (params, processAlias, transitionName) =>
+    dispatch(initiateInquiryWithoutPayment(params, processAlias, transitionName)),
+  onCreateSellerListing: (createParams, queryParams) =>
+    dispatch(createSellerListing(createParams, queryParams)),
+  onUpdateOffer: params => dispatch(updateOfferForm(params)),
 });
 
 // Note: it is important that the withRouter HOC is **outside** the
@@ -609,11 +833,6 @@ const mapDispatchToProps = dispatch => ({
 // lifecycle hook.
 //
 // See: https://github.com/ReactTraining/react-router/issues/4671
-const ListingPage = compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )
-)(EnhancedListingPage);
+const ListingPage = compose(connect(mapStateToProps, mapDispatchToProps))(EnhancedListingPage);
 
 export default ListingPage;

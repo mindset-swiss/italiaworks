@@ -1,11 +1,12 @@
-import React from 'react';
-import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import PropTypes from 'prop-types';
+import React from 'react';
 
 // Import configs and util modules
 import { FormattedMessage } from '../../../../util/reactIntl';
-import { LISTING_STATE_DRAFT } from '../../../../util/types';
 import { types as sdkTypes } from '../../../../util/sdkLoader';
+import { LISTING_STATE_DRAFT } from '../../../../util/types';
+import { isValidCurrencyForTransactionProcess } from '../../../../util/fieldHelpers';
 
 // Import shared components
 import { H3, ListingLink } from '../../../../components';
@@ -18,9 +19,15 @@ const { Money } = sdkTypes;
 
 const getInitialValues = params => {
   const { listing } = params;
-  const { price } = listing?.attributes || {};
+  const { price, publicData } = listing?.attributes || {};
+  const { flex_price } = publicData || {};
 
-  return { price };
+  return { price, flex_price };
+};
+
+const getListingTypeConfig = (publicData, listingTypes) => {
+  const selectedListingType = publicData.listingType;
+  return listingTypes.find(conf => conf.listingType === selectedListingType);
 };
 
 const EditListingPricingPanel = props => {
@@ -34,6 +41,7 @@ const EditListingPricingPanel = props => {
     ready,
     onSubmit,
     submitButtonText,
+    listingTypes,
     panelUpdated,
     updateInProgress,
     errors,
@@ -42,10 +50,21 @@ const EditListingPricingPanel = props => {
   const classes = classNames(rootClassName || css.root, className);
   const initialValues = getInitialValues(props);
   const isPublished = listing?.id && listing?.attributes?.state !== LISTING_STATE_DRAFT;
-  const priceCurrencyValid =
-    marketplaceCurrency && initialValues.price instanceof Money
-      ? initialValues.price.currency === marketplaceCurrency
-      : !!marketplaceCurrency;
+
+  const publicData = listing?.attributes?.publicData;
+  const listingTypeConfig = getListingTypeConfig(publicData, listingTypes);
+  const transactionProcessAlias = listingTypeConfig.transactionType.alias;
+
+  const isCompatibleCurrency = isValidCurrencyForTransactionProcess(
+    transactionProcessAlias,
+    marketplaceCurrency
+  );
+
+  const priceCurrencyValid = !isCompatibleCurrency
+    ? false
+    : marketplaceCurrency && initialValues.price instanceof Money
+    ? initialValues.price.currency === marketplaceCurrency
+    : !!marketplaceCurrency;
   const unitType = listing?.attributes?.publicData?.unitType;
 
   return (
@@ -68,12 +87,16 @@ const EditListingPricingPanel = props => {
           className={css.form}
           initialValues={initialValues}
           onSubmit={values => {
-            const { price } = values;
+            const { price, flex_price } = values;
 
             // New values for listing attributes
             const updateValues = {
               price,
+              publicData: {
+                flex_price,
+              },
             };
+
             onSubmit(updateValues);
           }}
           marketplaceCurrency={marketplaceCurrency}

@@ -2,9 +2,9 @@
 // so, they are not directly calling Marketplace API or Integration API.
 // You can find these api endpoints from 'server/api/...' directory
 
+import Decimal from 'decimal.js';
 import appSettings from '../config/settings';
 import { types as sdkTypes, transit } from './sdkLoader';
-import Decimal from 'decimal.js';
 
 export const apiBaseUrl = marketplaceRootURL => {
   const port = process.env.REACT_APP_DEV_API_SERVER_PORT;
@@ -53,16 +53,20 @@ const request = (path, options = {}) => {
   const url = `${apiBaseUrl()}${path}`;
   const { credentials, headers, body, ...rest } = options;
 
+  // Check if body is an instance of FormData
+  const isFormData = body instanceof FormData;
+
   // If headers are not set, we assume that the body should be serialized as transit format.
+  // If it's not FormData, determine if the body should be serialized as transit
   const shouldSerializeBody =
-    (!headers || headers['Content-Type'] === 'application/transit+json') && body;
-  const bodyMaybe = shouldSerializeBody ? { body: serialize(body) } : {};
+    !isFormData && (!headers || headers['Content-Type'] === 'application/transit+json') && body;
+  const bodyMaybe = shouldSerializeBody ? { body: serialize(body) } : { body };
 
   const fetchOptions = {
     credentials: credentials || 'include',
     // Since server/api mostly talks to Marketplace API using SDK,
     // we default to 'application/transit+json' as content type (as SDK uses transit).
-    headers: headers || { 'Content-Type': 'application/transit+json' },
+    headers: headers || (isFormData ? {} : { 'Content-Type': 'application/transit+json' }), // Do not set Content-Type if it's FormData
     ...bodyMaybe,
     ...rest,
   };
@@ -96,7 +100,6 @@ const post = (path, body, options = {}) => {
     method: methods.POST,
     body,
   };
-
   return request(path, requestOptions);
 };
 
@@ -143,4 +146,39 @@ export const transitionPrivileged = body => {
 // be sent in the body.
 export const createUserWithIdp = body => {
   return post('/api/auth/create-user-with-idp', body);
+};
+
+export const getOfferListingbyListingId = body => {
+  return post(`/api/offer-listing-page`, body);
+};
+
+export const postUploadToS3 = files => {
+  const formData = new FormData();
+
+  // Assuming files is an array of File objects
+  files.forEach((file, index) => {
+    formData.append('files', file);
+  });
+
+  const requestOptions = {
+    method: 'POST',
+    body: formData,
+    headers: {
+      // Let the browser set the appropriate 'Content-Type' for FormData
+      // Content-Type should not be explicitly set here because FormData needs to include boundary
+    },
+  };
+  return request('/api/upload-s3', requestOptions);
+};
+
+export const updateOfferListing = body => {
+  return post('/api/update-offer-listing', body);
+};
+
+export const getProfileUserInfo = body => {
+  return post('/api//get-user-info', body);
+};
+
+export const updatePublicReview = body => {
+  return post('/api/update-public-review', body);
 };

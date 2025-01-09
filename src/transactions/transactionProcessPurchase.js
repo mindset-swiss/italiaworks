@@ -171,28 +171,7 @@ export const graph = {
 
     [states.RECEIVED]: {
       on: {
-        [transitions.AUTO_COMPLETE]: states.COMPLETED,
-      },
-    },
-
-    [states.COMPLETED]: {
-      on: {
-        [transitions.EXPIRE_REVIEW_PERIOD]: states.REVIEWED,
-        [transitions.REVIEW_1_BY_CUSTOMER]: states.REVIEWED_BY_CUSTOMER,
-        [transitions.REVIEW_1_BY_PROVIDER]: states.REVIEWED_BY_PROVIDER,
-      },
-    },
-
-    [states.REVIEWED_BY_CUSTOMER]: {
-      on: {
-        [transitions.REVIEW_2_BY_PROVIDER]: states.REVIEWED,
-        [transitions.EXPIRE_PROVIDER_REVIEW_PERIOD]: states.REVIEWED,
-      },
-    },
-    [states.REVIEWED_BY_PROVIDER]: {
-      on: {
-        [transitions.REVIEW_2_BY_CUSTOMER]: states.REVIEWED,
-        [transitions.EXPIRE_CUSTOMER_REVIEW_PERIOD]: states.REVIEWED,
+        [transitions.AUTO_COMPLETE]: states.REVIEWED,
       },
     },
     [states.REVIEWED]: { type: 'final' },
@@ -213,10 +192,6 @@ export const isRelevantPastTransition = transition => {
     transitions.AUTO_COMPLETE,
     transitions.AUTO_CANCEL_FROM_DISPUTED,
     transitions.CANCEL_FROM_DISPUTED,
-    transitions.REVIEW_1_BY_CUSTOMER,
-    transitions.REVIEW_1_BY_PROVIDER,
-    transitions.REVIEW_2_BY_CUSTOMER,
-    transitions.REVIEW_2_BY_PROVIDER,
   ].includes(transition);
 };
 export const isCustomerReview = transition => {
@@ -243,13 +218,6 @@ export const isPrivileged = transition => {
 export const isCompleted = transition => {
   const txCompletedTransitions = [
     transitions.AUTO_COMPLETE,
-    transitions.REVIEW_1_BY_CUSTOMER,
-    transitions.REVIEW_1_BY_PROVIDER,
-    transitions.REVIEW_2_BY_CUSTOMER,
-    transitions.REVIEW_2_BY_PROVIDER,
-    transitions.EXPIRE_REVIEW_PERIOD,
-    transitions.EXPIRE_CUSTOMER_REVIEW_PERIOD,
-    transitions.EXPIRE_PROVIDER_REVIEW_PERIOD,
   ];
   return txCompletedTransitions.includes(transition);
 };

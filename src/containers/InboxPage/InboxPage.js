@@ -1,52 +1,54 @@
-import React from 'react';
-import { arrayOf, bool, number, oneOf, shape, string } from 'prop-types';
-import { compose } from 'redux';
-import { connect } from 'react-redux';
 import classNames from 'classnames';
+import { arrayOf, bool, number, oneOf, shape, string } from 'prop-types';
+import React from 'react';
+import { connect } from 'react-redux';
+import { compose } from 'redux';
 
 import { useConfiguration } from '../../context/configurationContext';
 
-import { FormattedMessage, injectIntl, intlShape } from '../../util/reactIntl';
-import {
-  propTypes,
-  DATE_TYPE_DATE,
-  DATE_TYPE_DATETIME,
-  LINE_ITEM_NIGHT,
-  LINE_ITEM_HOUR,
-  LISTING_UNIT_TYPES,
-  STOCK_MULTIPLE_ITEMS,
-} from '../../util/types';
-import { subtractTime } from '../../util/dates';
 import {
   TX_TRANSITION_ACTOR_CUSTOMER,
   TX_TRANSITION_ACTOR_PROVIDER,
-  resolveLatestProcessName,
   getProcess,
   isBookingProcess,
+  resolveLatestProcessName
 } from '../../transactions/transaction';
-
-import { getMarketplaceEntities } from '../../ducks/marketplaceData.duck';
-import { isScrollingDisabled } from '../../ducks/ui.duck';
+import { subtractTime } from '../../util/dates';
+import { FormattedMessage, injectIntl, intlShape } from '../../util/reactIntl';
 import {
-  H2,
+  DATE_TYPE_DATE,
+  DATE_TYPE_DATETIME,
+  LINE_ITEM_HOUR,
+  LINE_ITEM_NIGHT,
+  LISTING_UNIT_TYPES,
+  STOCK_MULTIPLE_ITEMS,
+  propTypes,
+  AVAILABILITY_MULTIPLE_SEATS,
+} from '../../util/types';
+
+import {
   Avatar,
+  H2,
+  IconSpinner,
+  LayoutSideNavigation,
   NamedLink,
   NotificationBadge,
   Page,
   PaginationLinks,
   TabNav,
-  IconSpinner,
   TimeRange,
   UserDisplayName,
-  LayoutSideNavigation,
 } from '../../components';
+import { getMarketplaceEntities } from '../../ducks/marketplaceData.duck';
+import { isScrollingDisabled } from '../../ducks/ui.duck';
 
-import TopbarContainer from '../../containers/TopbarContainer/TopbarContainer';
 import FooterContainer from '../../containers/FooterContainer/FooterContainer';
 import NotFoundPage from '../../containers/NotFoundPage/NotFoundPage';
+import TopbarContainer from '../../containers/TopbarContainer/TopbarContainer';
 
-import { stateDataShape, getStateData } from './InboxPage.stateData';
+import _ from 'lodash';
 import css from './InboxPage.module.css';
+import { getStateData, stateDataShape } from './InboxPage.stateData';
 
 // Check if the transaction line-items use booking-related units
 const getUnitLineItem = lineItems => {
@@ -89,8 +91,8 @@ const BookingTimeInfoMaybe = props => {
   const hasLineItems = transaction?.attributes?.lineItems?.length > 0;
   const unitLineItem = hasLineItems
     ? transaction.attributes?.lineItems?.find(
-        item => LISTING_UNIT_TYPES.includes(item.code) && !item.reversal
-      )
+      item => LISTING_UNIT_TYPES.includes(item.code) && !item.reversal
+    )
     : null;
 
   const lineItemUnitType = unitLineItem ? unitLineItem.code : null;
@@ -121,6 +123,7 @@ export const InboxItem = props => {
     intl,
     stateData,
     isBooking,
+    availabilityType,
     stockType = STOCK_MULTIPLE_ITEMS,
   } = props;
   const { customer, provider, listing } = tx;
@@ -132,7 +135,6 @@ export const InboxItem = props => {
   const unitLineItem = getUnitLineItem(lineItems);
   const quantity = hasPricingData && !isBooking ? unitLineItem.quantity.toString() : null;
   const showStock = stockType === STOCK_MULTIPLE_ITEMS || (quantity && unitLineItem.quantity > 1);
-
   const otherUser = isCustomer ? provider : customer;
   const otherUserDisplayName = <UserDisplayName user={otherUser} intl={intl} />;
   const isOtherUserBanned = otherUser.attributes.banned;
@@ -168,6 +170,11 @@ export const InboxItem = props => {
             <FormattedMessage id="InboxPage.quantity" values={{ quantity }} />
           ) : null}
         </div>
+        {availabilityType == AVAILABILITY_MULTIPLE_SEATS && unitLineItem?.seats ? (
+          <div className={css.itemSeats}>
+            <FormattedMessage id="InboxPage.seats" values={{ seats: unitLineItem.seats }} />
+          </div>
+        ) : null}
         <div className={css.itemState}>
           <div className={stateClasses}>
             <FormattedMessage
@@ -215,11 +222,12 @@ export const InboxPageComponent = props => {
 
   const pickType = lt => conf => conf.listingType === lt;
   const findListingTypeConfig = publicData => {
-    const listingTypeConfigs = config.listing?.listingTypes;
+    const listingTypeConfigs = config?.listing?.listingTypes;
     const { listingType } = publicData || {};
     const foundConfig = listingTypeConfigs?.find(pickType(listingType));
     return foundConfig;
   };
+
   const toTxItem = tx => {
     const transactionRole = isOrders ? TX_TRANSITION_ACTOR_CUSTOMER : TX_TRANSITION_ACTOR_PROVIDER;
     let stateData = null;
@@ -231,7 +239,7 @@ export const InboxPageComponent = props => {
 
     const publicData = tx?.listing?.attributes?.publicData || {};
     const foundListingTypeConfig = findListingTypeConfig(publicData);
-    const { transactionType, stockType } = foundListingTypeConfig || {};
+    const { transactionType, stockType, availabilityType } = foundListingTypeConfig || {};
     const process = tx?.attributes?.processName || transactionType?.transactionType;
     const transactionProcess = resolveLatestProcessName(process);
     const isBooking = isBookingProcess(transactionProcess);
@@ -245,6 +253,7 @@ export const InboxPageComponent = props => {
           intl={intl}
           stateData={stateData}
           stockType={stockType}
+          availabilityType={availabilityType}
           isBooking={isBooking}
         />
       </li>
@@ -371,6 +380,8 @@ InboxPageComponent.propTypes = {
 const mapStateToProps = state => {
   const { fetchInProgress, fetchOrdersOrSalesError, pagination, transactionRefs } = state.InboxPage;
   const { currentUser, currentUserNotificationCount: providerNotificationCount } = state.user;
+  const transactions = getMarketplaceEntities(state, transactionRefs);
+
   return {
     currentUser,
     fetchInProgress,
@@ -378,7 +389,7 @@ const mapStateToProps = state => {
     pagination,
     providerNotificationCount,
     scrollingDisabled: isScrollingDisabled(state),
-    transactions: getMarketplaceEntities(state, transactionRefs),
+    transactions: transactions,
   };
 };
 
