@@ -33,14 +33,15 @@ import { formatMoney } from '../../util/currency';
 import { userDisplayNameAsString } from '../../util/data';
 import { FormattedMessage, injectIntl, intlShape } from '../../util/reactIntl';
 import {
+  propTypes,
+  AVAILABILITY_MULTIPLE_SEATS,
+  LISTING_STATE_CLOSED,
+  LINE_ITEM_NIGHT,
   LINE_ITEM_DAY,
   LINE_ITEM_HOUR,
   LINE_ITEM_ITEM,
-  LINE_ITEM_NIGHT,
-  LISTING_STATE_CLOSED,
   STOCK_INFINITE_MULTIPLE_ITEMS,
   STOCK_MULTIPLE_ITEMS,
-  propTypes,
 } from '../../util/types';
 import { parse, stringify } from '../../util/urlHelpers';
 
@@ -199,6 +200,7 @@ const OrderPanel = props => {
 
   const publicData = listing?.attributes?.publicData || {};
   const { listingType, unitType, transactionProcessAlias = '', flex_price } = publicData || {};
+
   const processName = resolveLatestProcessName(transactionProcessAlias.split('/')[0]);
   const lineItemUnitType = lineItemUnitTypeMaybe || `line-item/${unitType}`;
 
@@ -256,6 +258,7 @@ const OrderPanel = props => {
   const allowOrdersOfMultipleItems = [STOCK_MULTIPLE_ITEMS, STOCK_INFINITE_MULTIPLE_ITEMS].includes(
     listingTypeConfig?.stockType
   );
+  const seatsEnabled = [AVAILABILITY_MULTIPLE_SEATS].includes(listingTypeConfig?.availabilityType);
 
   const showClosedListingHelpText = listing.id && isClosed;
   const isOrderOpen = !!parse(location.search).orderOpen;
@@ -314,6 +317,7 @@ const OrderPanel = props => {
           <InvalidCurrency />
         ) : showBookingTimeForm ? (
           <BookingTimeForm
+            seatsEnabled={seatsEnabled}
             className={css.bookingForm}
             formId="OrderPanelBookingTimeForm"
             lineItemUnitType={lineItemUnitType}
@@ -337,6 +341,7 @@ const OrderPanel = props => {
           />
         ) : showBookingDatesForm ? (
           <BookingDatesForm
+            seatsEnabled={seatsEnabled}
             className={css.bookingForm}
             formId="OrderPanelBookingDatesForm"
             lineItemUnitType={lineItemUnitType}
@@ -421,82 +426,32 @@ const OrderPanel = props => {
                   <FormattedMessage id="OrderPanel.customInquiryBudgetFlex" /></>
               ) : null}
             </div>
-            <div className={css.description}>
+            {!isOwnListing && <>
               <FormattedMessage id="OrderPanel.customInquiryFormPriceDescription" />
-            </div>
-            <PrimaryButton
-              onClick={() => {
-                if (!isOwnListing) {
-                  if (currentUser) {
-                    setInquiryModalOpen(true);
-                  } else {
-                    const state = { from: `${location.pathname}${location.search}${location.hash}` };
+              <PrimaryButton
+                onClick={() => {
+                  if (!isOwnListing) {
+                    if (currentUser) {
+                      setInquiryModalOpen(true);
+                    } else {
+                      const state = { from: `${location.pathname}${location.search}${location.hash}` };
 
 
-                    // signup and return back to listingPage.
-                    history.push(createResourceLocatorString('SignupPage', routes, {}, {}), state);
+                      // signup and return back to listingPage.
+                      history.push(createResourceLocatorString('SignupPage', routes, {}, {}), state);
+                    }
                   }
-                }
-              }}
-            >
-              <FormattedMessage id="OrderPanel.customInquiryform" />
-            </PrimaryButton>
+                }}
+              >
+                <FormattedMessage id="OrderPanel.customInquiryform" />
+              </PrimaryButton>
+            </>}
           </div>
         ) : !isKnownProcess ? (
           <p className={css.errorSidebar}>
             <FormattedMessage id="OrderPanel.unknownTransactionProcess" />
           </p>
         ) : null}
-      {/* </ModalInMobile> */}
-      {/* <div className={css.openOrderForm}>
-        <PriceMaybe
-          price={price}
-          publicData={publicData}
-          validListingTypes={validListingTypes}
-          intl={intl}
-          marketplaceCurrency={marketplaceCurrency}
-          showCurrencyMismatch
-        />
-
-        {isClosed ? (
-          <div className={css.closedListingButton}>
-            <FormattedMessage id="OrderPanel.closedListingButtonText" />
-          </div>
-        ) : (
-          <PrimaryButton
-            onClick={() => {
-
-              if (!isOwnListing) {
-                setInquiryModalOpen(true);
-              }
-              else {
-
-                handleSubmit(
-                  isOwnListing,
-                  isClosed,
-                  showInquiryForm,
-                  onSubmit,
-                  history,
-                  location
-                )
-              }
-            }
-
-            }
-            disabled={isOutOfStock}
-          >
-            {isBooking ? (
-              <FormattedMessage id="OrderPanel.ctaButtonMessageBooking" />
-            ) : isOutOfStock ? (
-              <FormattedMessage id="OrderPanel.ctaButtonMessageNoStock" />
-            ) : isPurchase ? (
-              <FormattedMessage id="OrderPanel.ctaButtonMessagePurchase" />
-            ) : (
-              <FormattedMessage id="OrderPanel.ctaButtonMessageInquiry" />
-            )}
-          </PrimaryButton>
-        )}
-      </div> */}
     </div>
   );
 };

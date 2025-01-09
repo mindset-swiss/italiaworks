@@ -58,12 +58,12 @@ export const priceForSchemaMaybe = (price, intl) => {
     const schemaPrice = convertMoneyToNumber(price);
     return schemaPrice
       ? {
-          price: intl.formatNumber(schemaPrice, {
-            minimumFractionDigits: 2,
-            maximumFractionDigits: 2,
-          }),
-          priceCurrency: price.currency,
-        }
+        price: intl.formatNumber(schemaPrice, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }),
+        priceCurrency: price.currency,
+      }
       : {};
   } catch (e) {
     return {};
@@ -195,27 +195,30 @@ export const handleSubmit = parameters => values => {
     bookingStartDate, // not relevant (omit)
     bookingEndDate, // not relevant (omit)
     quantity: quantityRaw,
+    seats: seatsRaw,
     deliveryMethod,
     ...otherOrderData
   } = values;
 
   const bookingMaybe = bookingDates
     ? {
-        bookingDates: {
-          bookingStart: bookingDates.startDate,
-          bookingEnd: bookingDates.endDate,
-        },
-      }
+      bookingDates: {
+        bookingStart: bookingDates.startDate,
+        bookingEnd: bookingDates.endDate,
+      },
+    }
     : bookingStartTime && bookingEndTime
-    ? {
+      ? {
         bookingDates: {
           bookingStart: timestampToDate(bookingStartTime),
           bookingEnd: timestampToDate(bookingEndTime),
         },
       }
-    : {};
+      : {};
   const quantity = Number.parseInt(quantityRaw, 10);
   const quantityMaybe = Number.isInteger(quantity) ? { quantity } : {};
+  const seats = Number.parseInt(seatsRaw, 10);
+  const seatsMaybe = Number.isInteger(seats) ? { seats } : {};
   const deliveryMethodMaybe = deliveryMethod ? { deliveryMethod } : {};
 
   const initialValues = {
@@ -223,6 +226,7 @@ export const handleSubmit = parameters => values => {
     orderData: {
       ...bookingMaybe,
       ...quantityMaybe,
+      ...seatsMaybe,
       ...deliveryMethodMaybe,
       ...otherOrderData,
     },
@@ -413,19 +417,19 @@ export const handleCustomSubmit = parameters => values => {
 
   const bookingMaybe = bookingDates
     ? {
-        bookingDates: {
-          bookingStart: bookingDates.startDate,
-          bookingEnd: bookingDates.endDate,
-        },
-      }
+      bookingDates: {
+        bookingStart: bookingDates.startDate,
+        bookingEnd: bookingDates.endDate,
+      },
+    }
     : bookingStartTime && bookingEndTime
-    ? {
+      ? {
         bookingDates: {
           bookingStart: timestampToDate(bookingStartTime),
           bookingEnd: timestampToDate(bookingEndTime),
         },
       }
-    : {};
+      : {};
   const quantity = Number.parseInt(quantityRaw, 10);
   const quantityMaybe = Number.isInteger(quantity) ? { quantity } : {};
   const deliveryMethodMaybe = deliveryMethod ? { deliveryMethod } : {};
@@ -470,7 +474,7 @@ export const handleCustomSubmit = parameters => values => {
 
 export const handleToggleFavorites = parameters => isFavorite => {
   const { currentUser, routes, location, history } = parameters;
-  
+
   if (!currentUser) {
     const state = {
       from: `${location.pathname}${location.search}${location.hash}`,
@@ -507,7 +511,19 @@ export const handleToggleFavorites = parameters => isFavorite => {
         },
       };
     }
-    
+
     onUpdateFavorites(payload);
   }
+}
+
+export const handleUpdateOffer = props => async values => {
+  const { onUpdateOffer } = props;
+  const { offerPrice, message, offerId } = values;
+  const updateValue = {
+    price: offerPrice,
+    description: message,
+    id: new UUID(offerId),
+  };
+
+  await onUpdateOffer(updateValue);
 };

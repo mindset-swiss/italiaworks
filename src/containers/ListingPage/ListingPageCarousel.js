@@ -69,6 +69,7 @@ import {
   getListingsOffeListingById,
   sendInquiry,
   setInitialValues,
+  updateOfferForm,
 } from './ListingPage.duck';
 
 import ActionBarMaybe from './ActionBarMaybe';
@@ -78,6 +79,7 @@ import {
   handleSubmit,
   handleSubmitCheckoutPageWithInquiry,
   handleSubmitInquiry,
+  handleUpdateOffer,
   listingImages,
   LoadingPage,
   priceData,
@@ -101,6 +103,7 @@ import { MIN_LENGTH_FOR_LONG_WORDS } from '../ProfilePage/ProfilePage.js';
 import SectionGallery from './SectionGallery.js';
 import SectionOfferListingsMaybe from './SectionOfferListingsMaybe.js';
 import { pushDataLayerEvent } from '../../analytics/analytics.js';
+import UpdateOfferForm from './UpdateOfferForm/UpdateOfferForm.js';
 
 const MIN_LENGTH_FOR_LONG_WORDS_IN_TITLE = 16;
 
@@ -112,6 +115,8 @@ export const ListingPageComponent = props => {
   );
 
   const [customInquiryModalOpen, setCustomInquiryModalOpen] = useState(false);
+  const [updateOfferModalOpen, setUpdateOfferModalOpen] = useState(false);
+  const [selectedListing, setSelectedListing] = useState(null);
 
   const {
     isAuthenticated,
@@ -147,6 +152,7 @@ export const ListingPageComponent = props => {
     onUpdateFavorites,
     userReviews,
     offerReviews,
+    onUpdateOffer,
   } = props;
 
   useEffect(() => {
@@ -164,6 +170,7 @@ export const ListingPageComponent = props => {
 
   const listingConfig = config.listing;
   const listingId = new UUID(rawParams.id);
+  const isVariant = rawParams.variant != null;
   const isPendingApprovalVariant = rawParams.variant === LISTING_PAGE_PENDING_APPROVAL_VARIANT;
   const isDraftVariant = rawParams.variant === LISTING_PAGE_DRAFT_VARIANT;
   const currentListing =
@@ -258,7 +265,7 @@ export const ListingPageComponent = props => {
   const currentAuthor = authorAvailable ? currentListing.author : null;
   const ensuredAuthor = ensureUser(currentAuthor);
   const noPayoutDetailsSetWithOwnListing =
-    isOwnListing && (processType !== 'inquiry' && !currentUser?.attributes?.stripeConnected);
+    isOwnListing && processType !== 'inquiry' && !currentUser?.attributes?.stripeConnected;
   const payoutDetailsWarning = noPayoutDetailsSetWithOwnListing ? (
     <span className={css.payoutDetailsWarning}>
       <FormattedMessage id="ListingPage.payoutDetailsWarning" values={{ processType }} />
@@ -349,6 +356,10 @@ export const ListingPageComponent = props => {
   });
 
   const displayDate = selectedDate ? moment(selectedDate).format('dddd D MMMM, YYYY') : null;
+  const handleUpdateOffeSubmit = handleUpdateOffer({
+    onUpdateOffer,
+  });
+
   const descriptionWithLinks = richText(description, {
     linkify: true,
     longWordMinLength: MIN_LENGTH_FOR_LONG_WORDS,
@@ -666,6 +677,8 @@ export const ListingPageComponent = props => {
                   isOwnListing={isOwnListing}
                   offerReviews={offerReviews}
                   calculateAvgRating={calculateAvgRating}
+                  setUpdateOfferModalOpen={setUpdateOfferModalOpen}
+                  setSelectedListing={setSelectedListing}
                 />
               </div>
               <div className={css.orderColumnForProductLayout}>
@@ -749,6 +762,53 @@ export const ListingPageComponent = props => {
               onManageDisableScrolling={onManageDisableScrolling}
             /> */}
         </div>
+       
+        <Modal
+          id="ListingPage.inquiry"
+          contentClassName={css.inquiryModalContent}
+          isOpen={isAuthenticated && customInquiryModalOpen}
+          onClose={() => setCustomInquiryModalOpen(false)}
+          usePortal
+          onManageDisableScrolling={onManageDisableScrolling}
+        >
+          <CustomInquiryForm
+            className={css.inquiryForm}
+            submitButtonWrapperClassName={css.inquirySubmitButtonWrapper}
+            listingTitle={title}
+            authorDisplayName={authorDisplayName}
+            sendInquiryError={sendInquiryError}
+            onSubmit={handleInquiryFormSubmit}
+            inProgress={sendInquiryInProgress}
+            marketplaceCurrency={config.currency}
+            offerPrice={price}
+            flex_price={Array.isArray(flex_price) && flex_price.length > 0}
+            listing={currentListing}
+          />
+        </Modal>
+
+        <Modal
+          id="ListingPage.editOffer"
+          contentClassName={css.inquiryModalContent}
+          isOpen={isAuthenticated && updateOfferModalOpen}
+          onClose={() => setUpdateOfferModalOpen(false)}
+          usePortal
+          onManageDisableScrolling={onManageDisableScrolling}
+        >
+          {selectedListing ? (
+            <UpdateOfferForm
+              className={css.inquiryForm}
+              submitButtonWrapperClassName={css.inquirySubmitButtonWrapper}
+              listingTitle={title}
+              authorDisplayName={authorDisplayName}
+              sendInquiryError={sendInquiryError}
+              onSubmit={handleUpdateOffeSubmit}
+              inProgress={sendInquiryInProgress}
+              marketplaceCurrency={config.currency}
+              listing={selectedListing}
+              flex_price={Array.isArray(flex_price) && flex_price.length > 0}
+            />
+          ) : null}
+        </Modal>
         <Modal
           id="ListingPage.inquiry"
           contentClassName={css.inquiryModalContent}
@@ -853,7 +913,7 @@ const EnhancedListingPage = props => {
   const location = useLocation();
 
   const showListingError = props.showListingError;
-  const isVariant = props.params?.variant?.length > 0;
+  const isVariant = props.params?.variant != null;
   const currentUser = props.currentUser;
   if (isForbiddenError(showListingError) && !isVariant && !currentUser) {
     // This can happen if private marketplace mode is active
@@ -932,7 +992,6 @@ const mapStateToProps = state => {
       : null;
 
 
-
   const getListing = id => {
     const ref = { id, type: 'listing' };
     const listings = getMarketplaceEntities(state, [ref]);
@@ -982,6 +1041,7 @@ const mapDispatchToProps = dispatch => ({
   onCreateSellerListing: (createParams, queryParams) =>
     dispatch(createSellerListing(createParams, queryParams)),
   onUpdateFavorites: (payload) => dispatch(updateProfile(payload)),
+  onUpdateOffer: params => dispatch(updateOfferForm(params)),
 });
 
 // Note: it is important that the withRouter HOC is **outside** the
@@ -990,11 +1050,6 @@ const mapDispatchToProps = dispatch => ({
 // lifecycle hook.
 //
 // See: https://github.com/ReactTraining/react-router/issues/4671
-const ListingPage = compose(
-  connect(
-    mapStateToProps,
-    mapDispatchToProps
-  )
-)(EnhancedListingPage);
+const ListingPage = compose(connect(mapStateToProps, mapDispatchToProps))(EnhancedListingPage);
 
 export default ListingPage;

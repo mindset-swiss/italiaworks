@@ -89,6 +89,7 @@ export { default as ModalInMobile } from './ModalInMobile/ModalInMobile';
 // Fields (for Final Form)
 export { default as FieldCheckbox } from './FieldCheckbox/FieldCheckbox';
 export { default as FieldCurrencyInput } from './FieldCurrencyInput/FieldCurrencyInput';
+export { default as FieldNumber } from './FieldNumber/FieldNumber';
 export { default as FieldRadioButton } from './FieldRadioButton/FieldRadioButton';
 export { default as FieldReviewRating } from './FieldReviewRating/FieldReviewRating';
 export { default as FieldSelect } from './FieldSelect/FieldSelect';
@@ -101,7 +102,6 @@ export { default as FieldCheckboxGroup } from './FieldCheckboxGroup/FieldCheckbo
 export { default as FieldPhoneNumberInput } from './FieldPhoneNumberInput/FieldPhoneNumberInput';
 export { FieldLocationAutocompleteInput, default as LocationAutocompleteInput } from './LocationAutocompleteInput/LocationAutocompleteInput';
 // Fields and inputs using old naming pattern
-export { default as StripeBankAccountTokenInputField } from './StripeBankAccountTokenInputField/StripeBankAccountTokenInputField';
 
 // NOTE: these are code-splitted since these components are heavy and needed only on couple of pages
 export const FieldDateRangePicker = loadable(() => import(/* webpackChunkName: "FieldDateRangePicker" */ './DatePicker/FieldDateRangePicker/FieldDateRangePicker'));
@@ -143,4 +143,7 @@ export { default as MaintenanceMode } from './MaintenanceMode/MaintenanceMode';
 export { default as ModalMissingInformation } from './ModalMissingInformation/ModalMissingInformation';
 
 export const FieldNormalDateInput = loadable(() => import(/* webpackChunkName: "FieldNormalDateInput" */ './FieldNormalDateInput/FieldNormalDateInput'));
+export { default as FieldDropzone } from './FieldDropzone/FieldDropzone';
+export { default as IconLink } from './IconLink/IconLink';
+export { default as ImageFromS3 } from './ImageFromS3/ImageFromS3';
 

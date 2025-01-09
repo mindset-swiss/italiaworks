@@ -151,13 +151,13 @@ const CustomInquiryFormComponent = props => {
         const submitDisabled = submitInProgress;
         const { offerPrice } = values || {};
         setOfferPriceValue(offerPrice);
-        const commissionPrice = new Money(offerPrice.amount / 10, offerPrice.currency);
-        const formattedCommissionPrice = formatMoney(intl, commissionPrice);
-        const earnPrice = new Money(
-          offerPrice.amount - commissionPrice.amount,
-          offerPrice.currency
-        );
-        const formattedEarnPrice = formatMoney(intl, earnPrice);
+        const commissionPrice =
+          offerPrice && new Money(offerPrice.amount / 10, offerPrice.currency);
+        const formattedCommissionPrice = commissionPrice && formatMoney(intl, commissionPrice);
+        const earnPrice =
+          commissionPrice &&
+          new Money(offerPrice.amount - commissionPrice.amount, offerPrice.currency);
+        const formattedEarnPrice = earnPrice ? formatMoney(intl, earnPrice) : '-';
         return (
           <Form
             className={classes}
@@ -182,6 +182,7 @@ const CustomInquiryFormComponent = props => {
                   label={offerPriceLabel}
                   placeholder={offerPricePlaceholder}
                   currencyConfig={appSettings.getCurrencyFormatting(marketplaceCurrency)}
+                  disabled={!flex_price}
                 />
 
                 <div className={classNames(css.flexContent, css.commissionContent)}>

@@ -15,12 +15,12 @@ import { pickCustomFieldProps } from '../../util/fieldHelpers';
 import { FormattedMessage, useIntl } from '../../util/reactIntl';
 import { richText } from '../../util/richText';
 import {
+  propTypes,
   REVIEW_TYPE_OF_CUSTOMER,
   REVIEW_TYPE_OF_PROVIDER,
   SCHEMA_TYPE_MULTI_ENUM,
   SCHEMA_TYPE_TEXT,
   SCHEMA_TYPE_YOUTUBE,
-  propTypes,
 } from '../../util/types';
 import {
   NO_ACCESS_PAGE_USER_PENDING_APPROVAL,
@@ -35,26 +35,40 @@ import {
   H2,
   H4,
   Heading,
+  ImageFromS3,
   LayoutSideNavigation,
   ListingCard,
   NamedLink,
   NamedRedirect,
   Page,
+  ReviewRating,
   Reviews,
 } from '../../components';
 import { getMarketplaceEntities } from '../../ducks/marketplaceData.duck';
-import { isScrollingDisabled } from '../../ducks/ui.duck';
+import { isScrollingDisabled, manageDisableScrolling } from '../../ducks/ui.duck';
 
 import FooterContainer from '../../containers/FooterContainer/FooterContainer';
 import NotFoundPage from '../../containers/NotFoundPage/NotFoundPage';
 import TopbarContainer from '../../containers/TopbarContainer/TopbarContainer';
 
+import _ from 'lodash';
+import moment from 'moment';
+import certifiticationPNG from '../../assets/certificates.png';
+import paymentVerifiedPNG from '../../assets/payment-verified.png';
+import profileVerifiedPNG from '../../assets/profile-verified.png';
+import topUserPNG from '../../assets/top-user.png';
+import {
+  checkFileType,
+  FILE_DOCUMENT_TYPES,
+  PreviewLink,
+} from '../../components/FieldDropzone/FieldDropzone';
+import CustomReviewModal from './CustomReviewModal/CustomReviewModal';
+import { addUserReview } from './ProfilePage.duck';
 import css from './ProfilePage.module.css';
 import SectionDetailsMaybe from './SectionDetailsMaybe';
 import SectionMultiEnumMaybe from './SectionMultiEnumMaybe';
 import SectionTextMaybe from './SectionTextMaybe';
 import SectionYoutubeVideoMaybe from './SectionYoutubeVideoMaybe';
-import _ from 'lodash';
 
 import Share from '../../components/Share/Share';
 
@@ -62,16 +76,35 @@ const MAX_MOBILE_SCREEN_WIDTH = 768;
 export const MIN_LENGTH_FOR_LONG_WORDS = 20;
 
 export const AsideContent = props => {
-  const { user, displayName, showLinkToProfileSettingsPage } = props;
   const intl = useIntl();
+  const { user, displayName, showLinkToProfileSettingsPage, publicData } = props;
+  const { stripeAccount } = user;
+  const { certifications, top_user_badge } = publicData || {};
 
   return (
     <div className={css.asideContent}>
       <AvatarLarge className={css.avatar} user={user} disableProfileLink />
+      <div className={css.displayFlexDesktop}>
+        {stripeAccount ? <img src={paymentVerifiedPNG} height={20} width={20} /> : null}
+        {stripeAccount ? <img src={profileVerifiedPNG} height={20} width={20} /> : null}
+        {certifications && Array.isArray(certifications) && certifications.length > 0 ? (
+          <img src={certifiticationPNG} height={20} width={20} />
+        ) : null}
+        {top_user_badge ? <img src={topUserPNG} height={20} width={20} /> : null}
+      </div>
+
       <H2 as="h1" className={css.mobileHeading}>
         {displayName ? (
           <FormattedMessage id="ProfilePage.mobileHeading" values={{ name: displayName }} />
         ) : null}
+        <div className={css.displayFlex}>
+          {stripeAccount ? <img src={paymentVerifiedPNG} height={20} width={20} /> : null}
+          {stripeAccount ? <img src={profileVerifiedPNG} height={20} width={20} /> : null}
+          {certifications && Array.isArray(certifications) && certifications.length > 0 ? (
+            <img src={certifiticationPNG} height={20} width={20} />
+          ) : null}
+          {top_user_badge ? <img src={topUserPNG} height={20} width={20} /> : null}
+        </div>
       </H2>
       {showLinkToProfileSettingsPage ? (
         <>
@@ -183,7 +216,7 @@ export const DesktopReviews = props => {
 
 export const CustomUserFields = props => {
   const { publicData, metadata, userFieldConfig } = props;
-
+  const { certifications } = publicData;
   const shouldPickUserField = fieldConfig => fieldConfig?.showConfig?.displayInProfile !== false;
   const propsForCustomFields =
     pickCustomFieldProps(publicData, metadata, userFieldConfig, 'userType', shouldPickUserField) ||
@@ -202,6 +235,47 @@ export const CustomUserFields = props => {
           <SectionYoutubeVideoMaybe {...fieldProps} />
         ) : null;
       })}
+      {certifications ? (
+        <div>
+          <Heading as="h2" rootClassName={css.sectionHeading}>
+            <FormattedMessage id="ProfilePage.certification" />
+          </Heading>
+          <div className={css.flexCertification}>
+            {certifications.map(certification => {
+              const fileType = checkFileType(certification).split(',')[1];
+              const getFileName = checkFileType(certification).split(',')[0];
+              const isFileDocument = FILE_DOCUMENT_TYPES.includes(fileType.toString());
+
+              const renderDocument = (
+                <div className={css.thumbFile}>
+                  <span className={css.thumbFileText}>{getFileName}</span>
+                </div>
+              );
+
+              const renderFile = isFileDocument ? (
+                renderDocument
+              ) : (
+                <ImageFromS3
+                  id={certification}
+                  rootClassName={css.thumbImage}
+                  aspectWidth={1}
+                  aspectHeight={1}
+                  file={certification}
+                />
+              );
+
+              return (
+                <li className={css.thumb} key={certification}>
+                  <div className={css.actionButtons}>
+                    <PreviewLink file={certification} />
+                  </div>
+                  <div className={css.thumbInner}>{renderFile}</div>
+                </li>
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
     </>
   );
 };
@@ -220,6 +294,18 @@ export const MainContent = props => {
     userFieldConfig,
     intl,
     hideReviews,
+    onManageDisableScrolling,
+    setReviewModalOpen,
+    isReviewModalOpen,
+    config,
+    reviewSubmitted,
+    setReviewSubmitted,
+    sendReviewInProgress,
+    sendReviewError,
+    isCurrentUser,
+    onSendReview,
+    profileId,
+    currentUserDisplayName,
   } = props;
 
   const hasListings = listings.length > 0;
@@ -246,12 +332,50 @@ export const MainContent = props => {
       </p>
     );
   }
+
+  const { publicReviews } = publicData || {};
+
+  let openReview = publicReviews;
+
+  // Submit review and close the review modal
+  const onSubmitReview = values => {
+    const { reviewRating, reviewContent } = values;
+    const rating = Number.parseInt(reviewRating, 10);
+    const review = {
+      reviewRating: rating,
+      reviewContent,
+      createdAt: new Date().toISOString(),
+      name: currentUserDisplayName,
+    };
+    if (openReview && Array.isArray(openReview) && openReview.length > 0) {
+      openReview.push(review);
+    } else {
+      openReview = [review];
+    }
+
+    const params = {
+      id: profileId,
+      publicData: {
+        publicReviews: openReview,
+      },
+    };
+
+    onSendReview(params)
+      .then(r => {
+        setReviewModalOpen(false);
+        setReviewSubmitted(true);
+      })
+      .catch(e => {
+        // Do nothing.
+      });
+  };
+
   return (
     <div>
       <H2 as="h1" className={css.desktopHeading}>
         <FormattedMessage id="ProfilePage.desktopHeading" values={{ name: displayName }} />
       </H2>
-      {hasBio ? <p className={css.bio}>{bioWithLinks}</p> : null}
+      {/* {hasBio ? <p className={css.bio}>{bioWithLinks}</p> : null} */}
 
       {displayName ? (
         <CustomUserFields
@@ -276,11 +400,61 @@ export const MainContent = props => {
           </ul>
         </div>
       ) : null}
+
+      {!isCurrentUser ? (
+        <div
+          className={css.reviewBtton}
+          onClick={() => {
+            setReviewModalOpen(true);
+          }}
+        >
+          <FormattedMessage id="ProfilePage.reviewButton" />
+        </div>
+      ) : null}
+
+      {publicReviews ? (
+        <div className={css.publicReviewComponent}>
+          <H4 as="h2" className={css.publicReviewTitle}>
+            <FormattedMessage id="ProfilePage.publicReview" />
+          </H4>
+
+          {publicReviews.map((review, index) => {
+            const getDate = review.createdAt ? moment(review.createdAt).format('DD/MM/YYYY') : null;
+            const displayName = review.name;
+            return (
+              <div className={css.publicReview} key={index}>
+                <ReviewRating
+                  rating={review.reviewRating}
+                  className={css.mobileReviewRating}
+                  reviewStarClassName={css.reviewRatingStar}
+                />
+                <div className={css.publicReviewContent}>{review.reviewContent}</div>
+
+                <div className={css.publicReviewName}>
+                  {displayName ? <div>{displayName}</div> : null}
+                  {getDate ? <div>{getDate}</div> : null}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      ) : null}
       {hideReviews ? null : isMobileLayout ? (
         <MobileReviews reviews={reviews} queryReviewsError={queryReviewsError} />
       ) : (
         <DesktopReviews reviews={reviews} queryReviewsError={queryReviewsError} />
       )}
+      <CustomReviewModal
+        id="ReviewOrderModal"
+        isOpen={isReviewModalOpen}
+        onCloseModal={() => setReviewModalOpen(false)}
+        onManageDisableScrolling={onManageDisableScrolling}
+        onSubmitReview={onSubmitReview}
+        reviewSent={reviewSubmitted}
+        sendReviewInProgress={sendReviewInProgress}
+        sendReviewError={sendReviewError}
+        marketplaceName={config.marketplaceName}
+      />
     </div>
   );
 };
@@ -289,6 +463,8 @@ export const ProfilePageComponent = props => {
   const config = useConfiguration();
   const intl = useIntl();
   const [mounted, setMounted] = useState(false);
+  const [isReviewModalOpen, setReviewModalOpen] = useState(false);
+  const [reviewSubmitted, setReviewSubmitted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
@@ -301,6 +477,8 @@ export const ProfilePageComponent = props => {
     useCurrentUser,
     userShowError,
     user,
+    onManageDisableScrolling,
+    onSendReview,
     ...rest
   } = props;
   const isVariant = pathParams.variant?.length > 0;
@@ -337,6 +515,7 @@ export const ProfilePageComponent = props => {
 
   const schemaTitleVars = { name: displayName, marketplaceName: config.marketplaceName };
   const schemaTitle = intl.formatMessage({ id: 'ProfilePage.schemaTitle' }, schemaTitleVars);
+  const { displayName: currentUserDisplayName } = currentUser?.attributes?.profile || {};
 
   if (!isDataLoaded) {
     return null;
@@ -416,6 +595,7 @@ export const ProfilePageComponent = props => {
             user={profileUser}
             showLinkToProfileSettingsPage={mounted && isCurrentUser}
             displayName={displayName}
+            publicData={publicData}
           />
         }
         footer={<FooterContainer />}
@@ -429,6 +609,16 @@ export const ProfilePageComponent = props => {
           userFieldConfig={userFields}
           hideReviews={hasNoViewingRightsOnPrivateMarketplace}
           intl={intl}
+          onManageDisableScrolling={onManageDisableScrolling}
+          isReviewModalOpen={isReviewModalOpen}
+          setReviewModalOpen={setReviewModalOpen}
+          config={config}
+          reviewSubmitted={reviewSubmitted}
+          setReviewSubmitted={setReviewSubmitted}
+          isCurrentUser={isCurrentUser}
+          onSendReview={onSendReview}
+          profileId={profileUser?.id}
+          currentUserDisplayName={currentUserDisplayName}
           {...rest}
         />
       </LayoutSideNavigation>
@@ -466,6 +656,8 @@ const mapStateToProps = state => {
     userListingRefs,
     reviews,
     queryReviewsError,
+    sendReviewInProgress,
+    sendReviewError,
   } = state.ProfilePage;
 
   const userMatches = getMarketplaceEntities(state, [{ type: 'user', id: userId }]);
@@ -477,7 +669,11 @@ const mapStateToProps = state => {
     isCurrentUser && !(isUserAuthorized(currentUser) && hasPermissionToViewData(currentUser));
 
   const listingsData = getMarketplaceEntities(state, userListingRefs);
-  const listings = _.filter(listingsData, listing => listing.attributes.publicData.transactionProcessAlias !== "default-purchase/release-1");
+  const listings = _.filter(
+    listingsData,
+    listing =>
+      listing.attributes.publicData.transactionProcessAlias !== 'default-purchase/release-1'
+  );
 
   return {
     scrollingDisabled: isScrollingDisabled(state),
@@ -489,9 +685,19 @@ const mapStateToProps = state => {
     listings,
     reviews,
     queryReviewsError,
+    sendReviewInProgress,
+    sendReviewError,
   };
 };
 
-const ProfilePage = compose(connect(mapStateToProps))(ProfilePageComponent);
+const mapDispatchToProps = dispatch => {
+  return {
+    onManageDisableScrolling: (componentId, disableScrolling) =>
+      dispatch(manageDisableScrolling(componentId, disableScrolling)),
+    onSendReview: params => dispatch(addUserReview(params)),
+  };
+};
+
+const ProfilePage = compose(connect(mapStateToProps, mapDispatchToProps))(ProfilePageComponent);
 
 export default ProfilePage;
