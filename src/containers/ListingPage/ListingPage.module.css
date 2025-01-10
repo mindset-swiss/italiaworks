@@ -808,8 +808,8 @@
 .offerListingDescriptionContent {
   border: 1px solid #d6d6d6;
   border-radius: 8px;
-  padding: 16px;
-  margin: 8px 0px 0;
+  padding: 20px;
+  margin: 20px 0;
   font-size: 14px;
   font-weight: 500;
   line-height: 15.4px;
@@ -875,15 +875,15 @@
   white-space: pre-line;
   margin: 0;
   padding: 0;
-  max-height: 46.2px;
+  /* max-height: 46.2px; */
   font-weight: 500;
   line-height: 1.1;
   font-size: 16px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  /* overflow: hidden; */
+  /* text-overflow: ellipsis;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
-  display: -webkit-box;
+  display: -webkit-box; */
 
   /* @media (--viewportMedium) {
     margin: 4px 0 51px 0;

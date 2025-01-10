@@ -1,11 +1,11 @@
+import classNames from 'classnames';
 import React, { useEffect, useRef, useState } from 'react';
 import { useIntl } from 'react-intl';
-import classNames from 'classnames';
 
 import { OutsideClickHandler } from '../../../components';
 
-import { getISODateString, getStartOfDay, isValidDateString } from './DatePicker.helpers';
 import DatePicker from './DatePicker';
+import { getISODateString, getStartOfDay, isValidDateString } from './DatePicker.helpers';
 
 import css from './SingleDatepicker.module.css';
 
@@ -46,12 +46,16 @@ export const SingleDatePicker = props => {
   }, []);
 
   useEffect(() => {
-    if (mounted && value?.getTime() !== dateData?.date?.getTime()) {
-      // If mounted, changes to value should be reflected to 'date' state
-      setDateData({
-        date: value,
-        formatted: value ? intl.formatDate(value, dateFormatOptions) : '',
-      });
+    if (mounted && value && dateData) {
+      const convertedValue = new Date(value);
+      const convertedDateDate = new Date(dateData.date);
+      if (convertedValue?.getTime() !== convertedDateDate?.getTime()) {
+        // If mounted, changes to value should be reflected to 'date' state
+        setDateData({
+          date: value,
+          formatted: value ? intl.formatDate(value, dateFormatOptions) : '',
+        });
+      }
     }
   }, [mounted, value]);
 
@@ -132,8 +136,10 @@ export const SingleDatePicker = props => {
   };
 
   const capitalizeFirstLetter = val => {
-    return `${String(val).charAt(0).toUpperCase()}${String(val).slice(1)}`;
-  }
+    return `${String(val)
+      .charAt(0)
+      .toUpperCase()}${String(val).slice(1)}`;
+  };
 
   return (
     <OutsideClickHandler className={classes} onOutsideClick={handleBlur}>

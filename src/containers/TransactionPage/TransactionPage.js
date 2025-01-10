@@ -269,8 +269,6 @@ export const TransactionPageComponent = props => {
         };
     const params = { reviewRating: rating, reviewContent };
 
-    console.log(transactionRole);
-
     onSendReview(transaction, transitionOptions, params, config)
       .then(r => {
         setReviewModalOpen(false);
