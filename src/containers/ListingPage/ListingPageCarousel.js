@@ -334,8 +334,8 @@ export const ListingPageComponent = props => {
   const schemaAvailability = !currentListing.currentStock
     ? null
     : currentStock > 0
-      ? 'https://schema.org/InStock'
-      : 'https://schema.org/OutOfStock';
+    ? 'https://schema.org/InStock'
+    : 'https://schema.org/OutOfStock';
 
   const availabilityMaybe = schemaAvailability ? { availability: schemaAvailability } : {};
   const orderData = { deliveryMethod: 'none' };
@@ -371,7 +371,7 @@ export const ListingPageComponent = props => {
   const linkProps = {
     name: 'ProfilePage',
     params: {
-      id: ensuredAuthor.id.uuid
+      id: ensuredAuthor.id.uuid,
     },
   };
 
@@ -390,13 +390,10 @@ export const ListingPageComponent = props => {
     console.log('toggle');
 
     onToggleFavorites(isFavorite);
-  }
+  };
 
   const favoriteButton = (
-    <div
-      className={css.toggleFavorites}
-      onClick={toggleFavorites}
-    >
+    <div className={css.toggleFavorites} onClick={toggleFavorites}>
       {isFavorite ? (
         <>
           <svg
@@ -419,7 +416,8 @@ export const ListingPageComponent = props => {
             width="15"
             height="14"
             viewBox="0 0 15 14"
-            fill="none" xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
           >
             <path
               d="M13.2297 1.24474C11.2524 -0.053991 8.81083 0.552077 7.49266 2.03842C6.17449 0.552077 3.73288 -0.0611971 1.75565 1.24474C0.707095 1.93739 0.0480261 3.10627 0.00308468 4.34005C-0.101758 7.13957 2.47465 9.38354 6.40668 12.8252L6.48157 12.8901C7.05076 13.3879 7.92705 13.388 8.49627 12.8829L8.57864 12.8107C12.5107 9.37628 15.0796 7.13236 14.9822 4.33284C14.9373 3.10627 14.2782 1.93739 13.2297 1.24474ZM7.56755 11.7501L7.49266 11.8222L7.41777 11.7501C3.85271 8.64033 1.50099 6.584 1.50099 4.49879C1.50099 3.05577 2.62443 1.97348 4.12236 1.97348C5.27576 1.97348 6.39917 2.68782 6.79613 3.67628H8.19667C8.58615 2.68782 9.70956 1.97348 10.863 1.97348C12.3609 1.97348 13.4843 3.05577 13.4843 4.49879C13.4843 6.584 11.1326 8.64033 7.56755 11.7501Z"
@@ -440,7 +438,11 @@ export const ListingPageComponent = props => {
     const totalRating = uReviews.reduce((sum, review) => sum + review.attributes.rating, 0);
 
     return totalRating / uReviews.length;
-  }
+  };
+
+  const enableOffer = offerListingItems
+    ? !offerListingItems.some(item => item.author.id.uuid === currentUser.id.uuid)
+    : true;
 
   return (
     <Page
@@ -452,21 +454,30 @@ export const ListingPageComponent = props => {
       twitterImages={twitterImages}
       className={css.pageWrapper}
       socialSharing={{
-        title: intl.formatMessage({
-          id: 'ListingPage.ogTitle',
-        }, {
-          title,
-        }),
-        description: intl.formatMessage({
-          id: 'ListingPage.ogDescription',
-        }, {
-          title,
-        }),
-        images1200: [{
-          width: 1280,
-          height: 720,
-          url: 'https://cdn.prod.website-files.com/67388105e786c44d2fd25e83/6752e663a4801698954d151d_italiawork-social-sharing.jpg',
-        }],
+        title: intl.formatMessage(
+          {
+            id: 'ListingPage.ogTitle',
+          },
+          {
+            title,
+          }
+        ),
+        description: intl.formatMessage(
+          {
+            id: 'ListingPage.ogDescription',
+          },
+          {
+            title,
+          }
+        ),
+        images1200: [
+          {
+            width: 1280,
+            height: 720,
+            url:
+              'https://cdn.prod.website-files.com/67388105e786c44d2fd25e83/6752e663a4801698954d151d_italiawork-social-sharing.jpg',
+          },
+        ],
       }}
       schema={{
         '@context': 'http://schema.org',
@@ -510,7 +521,6 @@ export const ListingPageComponent = props => {
             ) : null}
             <div className={css.contentWrapperForProductLayout}>
               <div className={css.mainColumnForProductLayout}>
-
                 {/* <div className={css.mobileHeading}>
                   <H4 as="h1" className={css.orderPanelTitle}>
                     <FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />
@@ -526,10 +536,7 @@ export const ListingPageComponent = props => {
                 </div>
                 {/* <SectionTextMaybe text={description} showAsIngress /> */}
 
-                <NamedLink
-                  className={css.authorNameLink}
-                  {...linkProps}
-                >
+                <NamedLink className={css.authorNameLink} {...linkProps}>
                   <div className={css.author}>
                     <AvatarMedium
                       user={ensuredAuthor}
@@ -541,7 +548,7 @@ export const ListingPageComponent = props => {
                         <FormattedMessage
                           id="OrderPanel.author"
                           values={{
-                            name: authorDisplayName
+                            name: authorDisplayName,
                           }}
                         />
                       </span>
@@ -572,7 +579,12 @@ export const ListingPageComponent = props => {
                       <div className={css.projectTypeTopic}>
                         <FormattedMessage id="ListingPage.ListingPageCarousel.working" />
                       </div>
-                      <div className={css.projectTypeTitle}>{currentListing.attributes.publicData.location.address.replace(/, Italia$/, '')}</div>
+                      <div className={css.projectTypeTitle}>
+                        {currentListing.attributes.publicData.location.address.replace(
+                          /, Italia$/,
+                          ''
+                        )}
+                      </div>
                     </div>
                   </div>
                 )}
@@ -586,7 +598,9 @@ export const ListingPageComponent = props => {
                       <div className={css.projectTypeTopic}>
                         <FormattedMessage id="ListingPage.ListingPageCarousel.date" />
                       </div>
-                      <div className={`${css.projectTypeTitle} ${css.capitalize}`}>{displayDate}</div>
+                      <div className={`${css.projectTypeTitle} ${css.capitalize}`}>
+                        {displayDate}
+                      </div>
                     </div>
                   </div>
                 ) : null}
@@ -608,7 +622,9 @@ export const ListingPageComponent = props => {
                       {authorDisplayName}
                     </NamedLink>
                   }
-                  title={<FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />}
+                  title={
+                    <FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />
+                  }
                   titleDesktop={
                     <H4 as="h1" className={css.orderPanelTitle}>
                       <FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />
@@ -629,6 +645,7 @@ export const ListingPageComponent = props => {
                   dayCountAvailableForBooking={config.stripe.dayCountAvailableForBooking}
                   marketplaceName={config.marketplaceName}
                   setInquiryModalOpen={setCustomInquiryModalOpen}
+                  enableOffer={enableOffer}
                 />
 
                 {project_type && project_type !== 'online' ? (
@@ -699,7 +716,9 @@ export const ListingPageComponent = props => {
                       {authorDisplayName}
                     </NamedLink>
                   }
-                  title={<FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />}
+                  title={
+                    <FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />
+                  }
                   titleDesktop={
                     <H4 as="h1" className={css.orderPanelTitle}>
                       <FormattedMessage id="ListingPage.orderTitle" values={{ title: richTitle }} />
@@ -720,6 +739,7 @@ export const ListingPageComponent = props => {
                   dayCountAvailableForBooking={config.stripe.dayCountAvailableForBooking}
                   marketplaceName={config.marketplaceName}
                   setInquiryModalOpen={setCustomInquiryModalOpen}
+                  enableOffer={enableOffer}
                 />
               </div>
               <Modal
@@ -762,7 +782,7 @@ export const ListingPageComponent = props => {
               onManageDisableScrolling={onManageDisableScrolling}
             /> */}
         </div>
-       
+
         <Modal
           id="ListingPage.inquiry"
           contentClassName={css.inquiryModalContent}
@@ -831,8 +851,8 @@ export const ListingPageComponent = props => {
             listing={currentListing}
           />
         </Modal>
-      </LayoutSingleColumn >
-    </Page >
+      </LayoutSingleColumn>
+    </Page>
   );
 };
 
@@ -991,7 +1011,6 @@ const mapStateToProps = state => {
       ? getListingsOffeListingById(listingOfferEntities, stateOfferListingItems)
       : null;
 
-
   const getListing = id => {
     const ref = { id, type: 'listing' };
     const listings = getMarketplaceEntities(state, [ref]);
@@ -1040,7 +1059,7 @@ const mapDispatchToProps = dispatch => ({
     dispatch(initiateInquiryWithoutPayment(params, processAlias, transitionName)),
   onCreateSellerListing: (createParams, queryParams) =>
     dispatch(createSellerListing(createParams, queryParams)),
-  onUpdateFavorites: (payload) => dispatch(updateProfile(payload)),
+  onUpdateFavorites: payload => dispatch(updateProfile(payload)),
   onUpdateOffer: params => dispatch(updateOfferForm(params)),
 });
 

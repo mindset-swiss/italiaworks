@@ -196,6 +196,7 @@ const OrderPanel = props => {
     setInquiryModalOpen,
     currentUser,
     routes,
+    enableOffer,
   } = props;
 
   const publicData = listing?.attributes?.publicData || {};
@@ -429,6 +430,7 @@ const OrderPanel = props => {
             {!isOwnListing && <>
               <FormattedMessage id="OrderPanel.customInquiryFormPriceDescription" />
               <PrimaryButton
+                disabled={!enableOffer}
                 onClick={() => {
                   if (!isOwnListing) {
                     if (currentUser) {
@@ -469,6 +471,7 @@ OrderPanel.defaultProps = {
   lineItems: null,
   fetchLineItemsError: null,
   setInquiryModalOpen: null,
+  enableOffer:true,
 };
 
 OrderPanel.propTypes = {
@@ -507,6 +510,7 @@ OrderPanel.propTypes = {
   dayCountAvailableForBooking: number.isRequired,
   marketplaceName: string.isRequired,
   setInquiryModalOpen: func,
+  enableOffer: bool,
 
   // from withRouter
   history: shape({
