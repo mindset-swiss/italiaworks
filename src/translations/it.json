@@ -1196,5 +1196,8 @@
   "TransactionPage.leaveReview.provider.actionButton":"Concludi il lavoro ",
   "TransactionPage.leaveReview.customer.actionButton":"Rilascia il pagamento",
   "FieldDropzone.addImagesMessage":"Upload Files",
-  "FieldDropzone.browseMessage":"browse"
+  "FieldDropzone.browseMessage":"browse",
+  "EditListingWizard.edit.saveDescription":"Salva modifiche",
+  "EditListingWizard.edit.savePhotosAvanti":"Salva modifiche",
+  "EditListingWizard.edit.savePricingPublish":"Pubblica annuncio"
 }

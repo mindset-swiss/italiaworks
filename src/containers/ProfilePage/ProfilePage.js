@@ -78,7 +78,7 @@ export const MIN_LENGTH_FOR_LONG_WORDS = 20;
 export const AsideContent = props => {
   const intl = useIntl();
   const { user, displayName, showLinkToProfileSettingsPage, publicData } = props;
-  const { stripeAccount } = user;
+  const { stripeAccount } = user||{};
   const { certifications, top_user_badge } = publicData || {};
 
   return (

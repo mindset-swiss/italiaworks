@@ -118,8 +118,6 @@ const tabLabelAndSubmit = (intl, tab, isNewListingFlow, isPriceDisabled, process
   const processNameString = isNewListingFlow ? `${processName}.` : '';
   const newOrEdit = isNewListingFlow ? 'new' : 'edit';
 
-  console.log(tab);
-
   let labelKey = null;
   let submitButtonKey = null;
   if (tab === DETAILS) {
