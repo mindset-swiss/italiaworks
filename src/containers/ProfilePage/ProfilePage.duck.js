@@ -1,7 +1,6 @@
 import { addMarketplaceEntities } from '../../ducks/marketplaceData.duck';
 import { fetchCurrentUser } from '../../ducks/user.duck';
-import { getProfileUserInfo } from '../../util/api';
-import { updatePublicReview } from '../../util/api';
+import { getProfileUserInfo, updatePublicReview } from '../../util/api';
 import { denormalisedResponseEntities } from '../../util/data';
 import { storableError } from '../../util/errors';
 import { createImageVariantConfig, types as sdkTypes } from '../../util/sdkLoader';
@@ -270,6 +269,7 @@ export const loadData = (params, search, config) => (dispatch, getState, sdk) =>
       if (isCurrentUser(userId, currentUser) && isUserAuthorized(currentUser)) {
         // Scenario: 'active' user somehow tries to open a link for "variant" profile
         return Promise.all([
+          dispatch(customShowUser(userId, config)),
           dispatch(showUser(userId, config)),
           dispatch(queryUserListings(userId, config)),
           dispatch(queryUserReviews(userId)),
@@ -278,7 +278,11 @@ export const loadData = (params, search, config) => (dispatch, getState, sdk) =>
         // Handle a scenario, where user (in pending-approval state)
         // tries to see their own profile page.
         // => just set userId to state
-        return dispatch(showUserRequest(userId));
+        // return dispatch(showUserRequest(userId));
+        return Promise.all([
+          dispatch(customShowUser(userId, config)),
+          dispatch(showUserRequest(userId))
+        ])
       } else {
         return Promise.resolve({});
       }
